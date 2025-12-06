@@ -1,0 +1,9 @@
+logs/
+*.log
+*.log.*
+# Envs & secrets
+.env
+.env.local
+
+.mcp.json
+!.claude/settings.local.json
