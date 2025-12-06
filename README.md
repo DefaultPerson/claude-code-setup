@@ -4,18 +4,18 @@ Starter kit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) wi
 
 ## Features
 
-- **Security Guard**  blocks dangerous commands (`rm -rf /`, `.env` writes, privileged docker, etc.)
-- **TTS Notifications**  voice alerts when Claude finishes or needs input (ElevenLabs/OpenAI/pyttsx3)
-- **Status Line**  shows project, branch, model, and context usage
-- **MCP Servers**  sequential-thinking, context7, linear integration
-- **Cross-platform**  works on Linux, macOS, and Windows
+- **Security Guard** - blocks dangerous commands (`rm -rf /`, `.env` writes, privileged docker, etc.)
+- **TTS Notifications** - voice alerts when Claude finishes or needs input (ElevenLabs/OpenAI/pyttsx3)
+- **Status Line** - shows project, branch, model, and context usage
+- **MCP Servers** - sequential-thinking, context7, linear integration
+- **Cross-platform** - works on Linux, macOS, and Windows
 
 ## Prerequisites
 
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code/getting-started)
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 - Node.js (for MCP servers via npx)
-- Audio player: `ffplay` (ffmpeg), `mpv`, or `sox`  for TTS
+- Audio player: `ffplay` (ffmpeg), `mpv`, or `sox` for TTS
 
 ## Installation
 
@@ -41,18 +41,18 @@ cp .env.example .env
 
 ### 4. Configure MCP servers
 
+Linux/macOS:
 ```bash
 cp .mcp.json.sample .mcp.json
-# Edit .mcp.json with your API keys
 ```
 
-### 5. Windows users
-
-Copy Windows-specific settings:
-
+Windows:
 ```powershell
+copy .mcp.json.windows .mcp.json
 copy .claude\settings.local.json.windows .claude\settings.local.json
 ```
+
+Edit `.mcp.json` with your API keys.
 
 ## Configuration
 
@@ -86,16 +86,16 @@ OPENAI_API_KEY=                    # Required for dynamic mode
 
 | Hook | Purpose |
 |------|---------|
-| `guard.py` | PreToolUse  blocks dangerous bash commands |
-| `notification.py` | Stop/Notification  TTS voice alerts |
+| `guard.py` | PreToolUse - blocks dangerous bash commands |
+| `notification.py` | Stop/Notification - TTS voice alerts |
 | `statusline.py` | Status line with context usage |
 
 ## TTS Providers
 
 Priority order:
-1. **ElevenLabs**  best quality, requires `ELEVENLABS_API_KEY`
-2. **OpenAI**  good quality, requires `OPENAI_API_KEY`
-3. **pyttsx3**  offline fallback, no API key needed
+1. **ElevenLabs** - best quality, requires `ELEVENLABS_API_KEY`
+2. **OpenAI** - good quality, requires `OPENAI_API_KEY`
+3. **pyttsx3** - offline fallback, no API key needed
 
 ## License
 
