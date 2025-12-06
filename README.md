@@ -7,7 +7,7 @@ Starter kit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) wi
 - **Security Guard** - blocks dangerous commands (`rm -rf /`, `.env` writes, privileged docker, etc.)
 - **TTS Notifications** - voice alerts when Claude finishes or needs input (ElevenLabs/OpenAI/pyttsx3)
 - **Status Line** - shows project, branch, model, and context usage
-- **MCP Servers** - sequential-thinking, context7, linear integration
+- **MCP Servers** - sequential-thinking, context7, chrome-devtools integration
 - **Cross-platform** - works on Linux, macOS, and Windows
 
 ## Prerequisites
@@ -52,35 +52,7 @@ copy .mcp.json.windows .mcp.json
 copy .claude\settings.local.json.windows .claude\settings.local.json
 ```
 
-Edit `.mcp.json` with your API keys.
-
-## Configuration
-
-### `.env` file
-
-```bash
-TTS_LANGUAGE=en                    # en or ru
-TTS_MODE=static                    # static or dynamic
-ELEVENLABS_API_KEY=                # Best quality TTS
-OPENAI_API_KEY=                    # Required for dynamic mode
-```
-
-### `.mcp.json` file
-
-```json
-{
-  "mcpServers": {
-    "sequential-thinking": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
-    },
-    "context7": {
-      "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp", "--api-key", "YOUR_KEY"]
-    }
-  }
-}
-```
+Edit `.mcp.json` and `.env` with your API keys.
 
 ## Hooks
 
@@ -97,10 +69,6 @@ Priority order:
 2. **OpenAI** - good quality, requires `OPENAI_API_KEY`
 3. **pyttsx3** - offline fallback, no API key needed
 
-## License
-
-MIT
-
 ---
 
-https://t.me/agentSShit
+Guides >> [@agentSShit](https://t.me/agentSShit)
