@@ -8,9 +8,9 @@
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp", "--api-key", "YOUR_CONTEXT7_API_KEY"]
     },
-    "linear": {
+    "chrome-devtools": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://mcp.linear.app/sse"]
+      "args": ["chrome-devtools-mcp@latest"]
     }
   }
 }
