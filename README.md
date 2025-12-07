@@ -7,7 +7,7 @@ Starter kit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) wi
 - **Security Guard** - blocks dangerous commands (`rm -rf /`, `.env` writes, privileged docker, etc.)
 - **TTS Notifications** - voice alerts when Claude finishes or needs input (ElevenLabs/OpenAI/pyttsx3)
 - **Status Line** - shows project, branch, model, and context usage
-- **MCP Servers** - sequential-thinking, context7, chrome-devtools integration
+- **MCP Servers** - sequential-thinking, context7, chrome-devtools, memory
 - **Cross-platform** - works on Linux, macOS, and Windows
 
 ## Prerequisites

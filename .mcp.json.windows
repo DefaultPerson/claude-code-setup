@@ -11,6 +11,13 @@
     "chrome-devtools": {
       "command": "npx.cmd",
       "args": ["chrome-devtools-mcp@latest"]
+    },
+    "memory": {
+      "command": "npx.cmd",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "env": {
+        "MEMORY_FILE_PATH": "C:\\Users\\YOUR_USER\\.claude\\memory.json"
+      }
     }
   }
 }
