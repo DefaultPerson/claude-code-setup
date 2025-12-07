@@ -1,54 +1,86 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.8"
-# ///
+#!/usr/bin/env python3
 """
 Claude Code PreToolUse Hook
 Blocks dangerous commands, protects .env files, logs all actions.
-Optimized for docker/docker-compose projects.
+Cross-platform: supports both Unix and Windows.
 """
 
 import json
 import sys
 import re
+import platform
 from pathlib import Path
 from datetime import datetime
 
+IS_WINDOWS = platform.system() == "Windows"
 
-def is_dangerous_rm_command(command: str) -> bool:
+
+def is_dangerous_delete_command(command: str) -> bool:
     """
-    Comprehensive detection of dangerous rm commands.
+    Detection of dangerous delete commands.
+    Cross-platform: Unix (rm) and Windows (del, rd, rmdir, Remove-Item).
     """
     normalized = ' '.join(command.lower().split())
 
-    # rm -rf variations
-    rm_patterns = [
-        r'\brm\s+.*-[a-z]*r[a-z]*f',      # rm -rf, rm -fr, rm -Rf
-        r'\brm\s+.*-[a-z]*f[a-z]*r',      # rm -fr variations
-        r'\brm\s+--recursive\s+--force',   # rm --recursive --force
-        r'\brm\s+--force\s+--recursive',   # rm --force --recursive
-        r'\brm\s+-r\s+.*-f',               # rm -r ... -f
-        r'\brm\s+-f\s+.*-r',               # rm -f ... -r
+    # === Unix patterns ===
+    unix_rm_patterns = [
+        r'\brm\s+.*-[a-z]*r[a-z]*f',
+        r'\brm\s+.*-[a-z]*f[a-z]*r',
+        r'\brm\s+--recursive\s+--force',
+        r'\brm\s+--force\s+--recursive',
+        r'\brm\s+-r\s+.*-f',
+        r'\brm\s+-f\s+.*-r',
     ]
 
-    for pattern in rm_patterns:
+    unix_dangerous_paths = [
+        r'\s/$',
+        r'\s/\s',
+        r'\s/\*',
+        r'\s~/?(\s|$)',
+        r'\s\$HOME',
+        r'\s\.\.',
+        r'\s\./?\s*$',
+        r'\s/etc\b',
+        r'\s/var\b',
+        r'\s/usr\b',
+        r'\s/home\b',
+        r'\s/root\b',
+    ]
+
+    # === Windows patterns ===
+    windows_del_patterns = [
+        r'\bdel\s+/[sfq]',                 # del /s, del /f, del /q
+        r'\brd\s+/[sq]',                   # rd /s, rd /q
+        r'\brmdir\s+/[sq]',                # rmdir /s, rmdir /q
+        r'remove-item\s+.*-recurse',       # PowerShell Remove-Item -Recurse
+        r'\bri\s+.*-r',                    # PowerShell alias ri -r
+    ]
+
+    windows_dangerous_paths = [
+        r'[a-z]:\\[\s\"\'\*]*$',           # C:\ or C:\*
+        r'[a-z]:\\windows\b',              # C:\Windows
+        r'[a-z]:\\program\s*files',        # C:\Program Files
+        r'[a-z]:\\users\\[^\s\\]+\\?\s*$', # C:\Users\username
+        r'[a-z]:\\users\\\*',              # C:\Users\*
+        r'%systemroot%',
+        r'%userprofile%',
+        r'%programfiles%',
+        r'\$env:systemroot',
+        r'\$env:userprofile',
+        r'\$home[\\/]?\s*$',               # PowerShell $HOME
+    ]
+
+    # Check Unix
+    for pattern in unix_rm_patterns:
         if re.search(pattern, normalized):
-            # Check dangerous paths
-            dangerous_paths = [
-                r'\s/$',              # / в конце
-                r'\s/\s',             # / как аргумент
-                r'\s/\*',             # /*
-                r'\s~/?(\s|$)',       # ~ или ~/
-                r'\s\$HOME',          # $HOME
-                r'\s\.\.',            # ..
-                r'\s\./?\s*$',        # . или ./
-                r'\s/etc\b',          # /etc
-                r'\s/var\b',          # /var
-                r'\s/usr\b',          # /usr
-                r'\s/home\b',         # /home
-                r'\s/root\b',         # /root
-            ]
-            for path in dangerous_paths:
+            for path in unix_dangerous_paths:
+                if re.search(path, normalized):
+                    return True
+
+    # Check Windows
+    for pattern in windows_del_patterns:
+        if re.search(pattern, normalized):
+            for path in windows_dangerous_paths:
                 if re.search(path, normalized):
                     return True
 
@@ -58,10 +90,12 @@ def is_dangerous_rm_command(command: str) -> bool:
 def is_dangerous_system_command(command: str) -> bool:
     """
     Detection of dangerous system commands.
+    Cross-platform: Unix and Windows/PowerShell.
     """
     normalized = ' '.join(command.lower().split())
 
-    dangerous_patterns = [
+    # === Unix dangerous patterns ===
+    unix_patterns = [
         # Disk formatting and writing
         (r'\bmkfs\.', "filesystem formatting"),
         (r'\bdd\s+.*of=/dev/', "direct disk write"),
@@ -92,7 +126,43 @@ def is_dangerous_system_command(command: str) -> bool:
         (r'\bbash\s+-i\s+>&\s+/dev/tcp/', "reverse shell"),
     ]
 
-    for pattern, reason in dangerous_patterns:
+    # === Windows dangerous patterns ===
+    windows_patterns = [
+        # Disk operations
+        (r'\bformat\s+[a-z]:', "disk format"),
+        (r'\bdiskpart\b', "disk partitioning"),
+        (r'\bbcdboot\b', "boot configuration"),
+        (r'\bbcdedit\b', "boot configuration edit"),
+
+        # Registry attacks
+        (r'\breg\s+delete\s+hk', "registry delete"),
+        (r'remove-itemproperty.*registry', "PowerShell registry delete"),
+
+        # User/system attacks
+        (r'\bnet\s+user\s+.*\s+/delete', "user delete"),
+        (r'\bnet\s+localgroup\s+administrators', "admin group modify"),
+
+        # Download and execute (PowerShell)
+        (r'iex\s*\(.*downloadstring', "PowerShell download & execute"),
+        (r'invoke-expression.*net\.webclient', "PowerShell download & execute"),
+        (r'powershell\s+.*-enc', "encoded PowerShell command"),
+        (r'powershell\s+.*-e\s+[a-z0-9+/=]', "encoded PowerShell command"),
+
+        # System operations
+        (r'\bshutdown\s+/[srt]', "system shutdown"),
+        (r'stop-computer', "PowerShell shutdown"),
+        (r'restart-computer', "PowerShell restart"),
+
+        # Service attacks
+        (r'\bsc\s+delete\b', "service delete"),
+        (r'stop-service.*-force', "force stop service"),
+    ]
+
+    for pattern, reason in unix_patterns:
+        if re.search(pattern, normalized):
+            return True, reason
+
+    for pattern, reason in windows_patterns:
         if re.search(pattern, normalized):
             return True, reason
 
@@ -120,17 +190,27 @@ def is_env_file_write(tool_name: str, tool_input: dict) -> bool:
 
     elif tool_name == 'Bash':
         command = tool_input.get('command', '')
-        # Block only writing to .env
-        write_patterns = [
-            r'>\s*[^\s]*\.env\b(?!\.(sample|example|template|dist))',      # > .env
-            r'>>\s*[^\s]*\.env\b(?!\.(sample|example|template|dist))',     # >> .env
-            r'tee\s+[^\|]*\.env\b(?!\.(sample|example|template|dist))',    # tee .env
-            r'cp\s+.*\s+[^\s]*\.env\s*$',                                   # cp ... .env
-            r'mv\s+.*\s+[^\s]*\.env\s*$',                                   # mv ... .env
-            r'rm\s+[^\|]*\.env\b(?!\.(sample|example|template|dist))',     # rm .env
+        # Block writing to .env (Unix patterns)
+        unix_write_patterns = [
+            r'>\s*[^\s]*\.env\b(?!\.(sample|example|template|dist))',
+            r'>>\s*[^\s]*\.env\b(?!\.(sample|example|template|dist))',
+            r'tee\s+[^\|]*\.env\b(?!\.(sample|example|template|dist))',
+            r'cp\s+.*\s+[^\s]*\.env\s*$',
+            r'mv\s+.*\s+[^\s]*\.env\s*$',
+            r'rm\s+[^\|]*\.env\b(?!\.(sample|example|template|dist))',
+        ]
+        # Block writing to .env (Windows patterns)
+        windows_write_patterns = [
+            r'copy\s+.*\s+[^\s]*\.env\s*$',
+            r'move\s+.*\s+[^\s]*\.env\s*$',
+            r'del\s+[^\s]*\.env\b(?!\.(sample|example|template|dist))',
+            r'type\s+.*>\s*[^\s]*\.env\b',
+            r'echo\s+.*>\s*[^\s]*\.env\b',
+            r'set-content\s+.*\.env\b(?!\.(sample|example|template|dist))',
+            r'out-file\s+.*\.env\b(?!\.(sample|example|template|dist))',
         ]
 
-        for pattern in write_patterns:
+        for pattern in unix_write_patterns + windows_write_patterns:
             if re.search(pattern, command):
                 return True
 
@@ -214,9 +294,9 @@ def main():
         if tool_name == 'Bash':
             command = tool_input.get('command', '')
 
-            # Check rm -rf
-            if is_dangerous_rm_command(command):
-                reason = "Dangerous rm command detected"
+            # Check dangerous delete commands (rm/del/rd)
+            if is_dangerous_delete_command(command):
+                reason = "Dangerous delete command detected"
                 log_action(log_dir, input_data, blocked=True, reason=reason)
                 print(f"BLOCKED: {reason}", file=sys.stderr)
                 sys.exit(2)
