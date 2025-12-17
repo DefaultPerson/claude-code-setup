@@ -1,7 +1,6 @@
 
 <instructions>
 - ALWAYS follow <answering_rules>, <self_reflection>, <dev_guidelines>, <cursor_prefs>
-- ALWAYS answer in Russian or English.
 
 <self_reflection>
 1. Spend time thinking of a rubric, from a role POV, until you are confident.
