@@ -15,13 +15,13 @@ def get_branch(project_dir: str) -> str:
     except:
         return ""
 
-def get_context_usage(transcript_path: str, model: str) -> str:
+def get_context_usage(transcript_path: str, context_limit: int) -> str:
     """Parse transcript to get context usage percentage."""
     try:
         if not transcript_path or not Path(transcript_path).exists():
             return ""
 
-        limit = 200_000
+        limit = context_limit or 200_000
 
         # Get LAST input tokens (each API call includes full message history)
         last_input = 0
@@ -69,13 +69,14 @@ def main():
     project_dir = data.get("workspace", {}).get("project_dir", "")
     model = data.get("model", {}).get("display_name", "?")
     transcript_path = data.get("transcript_path", "")
+    context_limit = data.get("context_window", {}).get("context_window_size", 200_000)
     branch = get_branch(project_dir)
 
     # Project folder name
     folder = Path(project_dir).name if project_dir else "?"
 
-    # Context usage
-    ctx = get_context_usage(transcript_path, model)
+    # Context usage (limit from context_window)
+    ctx = get_context_usage(transcript_path, context_limit)
 
     # ANSI colors
     C = "\033[36m"  # cyan

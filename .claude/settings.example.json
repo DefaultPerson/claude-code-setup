@@ -1,0 +1,47 @@
+{
+  "hooks": {
+    "PreCompact": [{
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "uv run /home/user/project/.claude/hooks/pre_compact.py"
+      }]
+    }],
+    "PreToolUse": [{
+      "matcher": "Bash",
+      "hooks": [{
+        "type": "command",
+        "command": "uv run /home/user/project/.claude/hooks/guard.py"
+      }]
+    }],
+    "Stop": [{
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "uv run /home/user/project/.claude/hooks/notification.py --notify"
+      }]
+    }],
+    "Notification": [{
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "uv run /home/user/project/.claude/hooks/notification.py --permission"
+      }]
+    }]
+  },
+  "permissions": {
+    "allow": [],
+    "deny": [],
+    "ask": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [],
+  "statusLine": {
+    "type": "command",
+    "command": "uv run /home/user/project/.claude/hooks/statusline.py",
+    "padding": 0
+  },
+  "env": {
+    "CONTEXT7_API_KEY": "paste_youre_token"
+  }
+}

@@ -1,9 +1,5 @@
 {
   "mcpServers": {
-    "sequential-thinking": {
-      "command": "npx.cmd",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
-    },
     "context7": {
       "command": "npx.cmd",
       "args": ["-y", "@upstash/context7-mcp", "--api-key", "YOUR_CONTEXT7_API_KEY"]
@@ -11,13 +7,6 @@
     "chrome-devtools": {
       "command": "npx.cmd",
       "args": ["chrome-devtools-mcp@latest"]
-    },
-    "memory": {
-      "command": "npx.cmd",
-      "args": ["-y", "@modelcontextprotocol/server-memory"],
-      "env": {
-        "MEMORY_FILE_PATH": "C:\\Users\\YOUR_USER\\.claude\\memory.json"
-      }
     }
   }
 }

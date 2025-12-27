@@ -31,7 +31,7 @@ CACHE_DIR = Path(__file__).parents[2] / "cache"  # .claude/hooks/cache/
 
 # ElevenLabs voices
 VOICES = {
-    "laura": "5Aahq892EEb6MdNwMM3p",       # Primary voice
+    "laura": "FGY2WhTYpPnrIDTdsKH5",  # Laura - Enthusiast, Quirky Attitude
     "rachel": "21m00Tcm4TlvDq8ikWAM",
     "elli": "MF3mGyEYCl7XYWbV9V6O",
     "bella": "EXAVITQu4vr4xnSDxMaL",
@@ -39,6 +39,7 @@ VOICES = {
 }
 
 DEFAULT_VOICE = "laura"
+MODEL_ID = "eleven_v3_dpo"
 
 
 def play_audio_file(filepath: str) -> None:
@@ -90,12 +91,9 @@ def speak(text: str, voice: str = DEFAULT_VOICE, save_to_cache: bool = False) ->
 
     data = {
         "text": text,
-        "model_id": "eleven_multilingual_v2",
+        "model_id": MODEL_ID,
         "voice_settings": {
-            "stability": 0.5,
-            "similarity_boost": 0.75,
-            "style": 0.3,
-            "use_speaker_boost": True,
+            "stability": 1.0,
         },
     }
 

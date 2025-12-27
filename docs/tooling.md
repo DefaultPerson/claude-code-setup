@@ -1,34 +1,35 @@
-## 1) MCP: When and How
+## 1) MCP Servers
 
-**Context7 (docs):** APIs/versions/patterns. `resolve-library-id → get-library-docs` (version/topic). Pin freshness, quotes ≤25 words.
-**Sequential-Thinking (analysis):** multi-layer tasks/architecture/debug. Decomposition → hypotheses → facts → conclusions. Modes: `--think`(4K)/`--think-hard`(10K)/`--ultrathink`(32K). Log conclusions; combine with Context7.
-**Chrome DevTools MCP:** Chrome DevTools API. Auto-selections of projects/frames, STDIO, consider quotas. Don't export assets — text/structure only.
+**Context7 (docs):** Library documentation lookup. `resolve-library-id → get-library-docs` (version/topic). Pin freshness, quotes ≤25 words.
+**Chrome DevTools MCP:** Browser automation, testing, performance analysis. Auto-selections of pages/frames. Consider quotas. Text/structure focus.
 
-## 2) Tool Selection and Policies
+## 2) Tool Selection
 
-**Tools:** Search — Grep(exact)/Agent(broad); Understanding — Sequential(>0.7)/Read(simple); Docs — Context7; Tests — Chrome DevTools MCP.
-**Delegation:** Score>0.6 → Task-tools (flags by scope); Wave>0.7 → Sequential for coordination.
-**By default:** Docs — Context7 (current versions). Libraries — latest stable, pin version.
+| Task | Tool |
+|------|------|
+| Code search (exact) | Grep |
+| Code search (broad) | Task agent (Explore) |
+| Documentation | Context7 or WebSearch+WebFetch |
+| Browser testing | Chrome DevTools MCP |
+| Deep analysis | Native extended thinking (/ultrathink) |
 
-## 3) Commands/Flags
+## 3) Built-in Tools (preferred)
 
-**Docs/research:** Context7 (`resolve → get-docs`, with topic/version).
-**Analysis:** Sequential (`--think`/`--ultrathink`), hypotheses/conclusions.
-**Tests:** Chrome DevTools MCP (critical paths,).
+- **WebSearch** — web search with current data
+- **WebFetch** — fetch and parse web pages
+- **Extended thinking** — native in Opus 4.5/Sonnet 4 (no MCP needed)
 
 ## 4) Orchestration
 
-**Coordination:** decomposition; dependencies: Context7 → Chrome DevTools MCP; unified response/PR.
-**Cache:** Context7(versions/patterns), Sequential(conclusions), Shared(links).
-**Resilience:** backoff, circuit-breaker, graceful degradation; alternative: Context7.
+**Coordination:** decomposition; dependencies: docs → implementation → tests; unified response.
+**Resilience:** backoff, graceful degradation; alternative sources.
 
-## 5) Web Search as 10×
+## 5) Web Search Tips
 
 Queries by signatures/errors/versions (`Class.method E123 v3.3 site:docs.vendor.com`).
 Priority: docs/RFC/release notes → issues/SO.
-Dates: 12–18 month horizon; pin version and date.
-Conflicts: 5-min repro/test. Always source+date; quotes ≤25 words; time-check.
+Conflicts: 5-min repro/test. Always source+date; quotes ≤25 words.
 
-## 6) Related Tools
+## 6) CLI Tools
 
-`gh` (PR/review/releases);
+`gh` (PR/review/releases), `git`, `uv` (Python), `pnpm` (Node.js)

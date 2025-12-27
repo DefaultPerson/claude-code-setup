@@ -55,6 +55,63 @@
 - Always label code blocks with the language.
 </cursor_prefs>
 
+<context_economy>
+## When to use subagents (Task tool) for context economy
+
+USE subagents when ALL conditions met:
+1. Task is **exploratory** (search, research, analysis) — not precise edits
+2. Output would be **verbose** (>50 lines) and needs filtering
+3. Task is **independent** — doesn't require full conversation history
+4. Multiple files/sources — not a single file read
+
+GOOD use cases:
+- Codebase exploration: "Find all files handling auth"
+- Web research: parallel searches, source synthesis
+- Test runs: filter to failures only
+- Multi-file analysis: summarize patterns across files
+
+BAD use cases (use direct tools instead):
+- Reading 1-2 specific files → Read tool
+- Simple grep for a pattern → Grep tool
+- Precise code edits → Edit tool directly
+- Tasks needing conversation context → stay in main thread
+
+RULE OF THUMB: If a direct tool call takes <10 lines of output, don't use subagent.
+</context_economy>
+
+<orchestration>
+## Cross-Check
+
+After significant changes (>3 files):
+1. Spawn subagent for review with context: `git diff`
+2. Subagent checks: correctness, security, edge cases
+3. If critical issues found → fix them
+
+## Worktree Usage
+
+Use worktree (via sandbox/worktree-dev agents):
+- Task will take >30 minutes
+- Need dev server on different port
+- Parallel work on multiple tasks
+
+Do NOT use worktree:
+- Quick fix (<5 minutes)
+- Documentation, configs
+</orchestration>
+
+<memory>
+## Persistent Memory (zero MCP overhead)
+
+On SESSION START: Read `.claude/memory.md` to recall context.
+
+BEFORE `/compact` or when context >70%: Update `.claude/memory.md` with:
+- Key decisions made this session (1-2 lines each)
+- Patterns/learnings worth remembering
+- Open questions for next session
+
+Keep memory.md LEAN (<50 lines). Old entries → archive or delete.
+</memory>
+
 <example>
 I'll answer as an expert software architect focused on AI tooling and developer UX.
 
@@ -65,7 +122,7 @@ I'll answer as an expert software architect focused on AI tooling and developer 
 </instructions>
 
 <context>
-1. Load nothing by default.
-2. About tools/integrations → @docs/tooling.md
-3. If about coding style/standards → use @docs/coding-standards.md
+1. On session start → read `.claude/memory.md` (persistent memory)
+2. About tools/integrations → docs/tooling.md
+3. If about coding style/standards → docs/coding-standards.md
 </context>

@@ -36,6 +36,26 @@ You **MUST** consider the user input before proceeding.
    **Status**: In Progress
    ```
 
+5. **Generate subtopics** (query decomposition):
+   - Decompose main topic into 3-5 focused subtopics
+   - Adapt subtopics based on detected mode:
+
+   **For Competitor Analysis**:
+   - What is {topic}? (market category, core value prop)
+   - Who are the main players? (direct competitors)
+   - How do they compare? (features, pricing, positioning)
+   - What are the problems? (complaints, limitations)
+   - What do users recommend? (community preferences)
+
+   **For Technical Research**:
+   - What is {topic}? (definition, core concepts)
+   - How does it work? (mechanics, implementation)
+   - What are the alternatives? (other approaches)
+   - What are the problems? (limitations, gotchas)
+   - What are best practices? (recommendations, patterns)
+
+   Show the research plan to user before starting deep research.
+
 ### Phase 1: Scope Clarification (if needed)
 
 Only ask clarifying questions if topic is genuinely ambiguous. **Max 3 questions.**
@@ -56,56 +76,115 @@ Possible questions (only if truly unclear):
 
 Skip clarification if topic is clear enough to proceed.
 
-### Phase 2: Research Execution
+### Phase 2: Deep Research Execution
 
-**Core principle: Claude determines queries and depth dynamically based on topic.**
+**Core principle: Multi-pass search with parallel exploration and source triangulation.**
 
-#### Research Approach
+#### Step 1: Parallel Subagent Research (MANDATORY for complex topics)
 
-1. **Start with broad discovery**:
-   - Generate search queries based on topic semantics
-   - Use current context (no hardcoded years or templates)
-   - Search for main topic, alternatives, comparisons, best practices
+**CRITICAL**: You MUST use the Task tool to spawn parallel agents. This is the ONLY way to achieve true parallelism and depth.
 
-2. **Analyze and identify gaps**:
-   - What information is missing?
-   - What claims need verification?
-   - What specific products/tools need deeper investigation?
+For each major subtopic from Phase 0, launch a dedicated agent in a **SINGLE message**:
 
-3. **Targeted deep dives**:
-   - Search for specific missing information
-   - Use WebFetch for official documentation, pricing pages, feature lists
-   - Use Context7 for library/framework documentation
+```
+Launch 2-3 agents in ONE message (parallel execution):
 
-4. **Iterate until coverage is sufficient**:
-   - No artificial limits on number of searches
-   - Stop when topic is well covered
-   - Stop when new searches don't yield new information
-   - Stop if user says "enough" or "хватит"
+Task(
+  subagent_type="general-purpose",
+  description="Research {topic} definition",
+  prompt="Research subtopic: What is {topic}? Find: definition, core concepts, how it works. Use WebSearch and WebFetch. Return structured findings with sources. Be thorough."
+)
+
+Task(
+  subagent_type="general-purpose",
+  description="Research {topic} alternatives",
+  prompt="Research subtopic: Alternatives to {topic}. Search for competitors, compare features/pricing. Use site:github.com for open-source options. Return structured findings with sources."
+)
+
+Task(
+  subagent_type="general-purpose",
+  description="Research {topic} problems",
+  prompt="Research subtopic: Problems with {topic}. Search HN (site:news.ycombinator.com), Reddit (site:reddit.com) for real user complaints and limitations. Return structured findings with sources."
+)
+```
+
+**Rules for parallel research**:
+- Launch 2-3 agents in ONE message (this triggers parallel execution)
+- Each agent gets ONE focused subtopic
+- Agents should use WebSearch, WebFetch, Context7
+- Wait for all agents to complete before moving to Step 2
+- For simple topics: skip parallel agents, do sequential search
+
+#### Step 2: Multi-Pass Search Strategy
+
+After parallel research, fill gaps with targeted passes:
+
+**Pass 1 — Broad Discovery** (if not done by agents):
+- General queries about the topic
+- Overview articles, official docs
+
+**Pass 2 — Expert Sources**:
+- `site:news.ycombinator.com {topic}` — developer opinions, real experiences
+- `site:reddit.com {topic}` — community insights, discussions
+- `site:arxiv.org {topic}` — academic research (if technical)
+- `site:github.com {topic} stars:>100` — proven solutions, popular repos
+- Context7 for library/framework documentation
+
+**Pass 3 — Gap Analysis & Targeted Search**:
+After each pass, evaluate internally:
+- What's confirmed? What's still missing?
+- What claims need verification from another source?
+- Generate targeted queries for gaps
+
+**Pass 4 — Counter-Arguments** (ALWAYS do this):
+- `{topic} problems`
+- `{topic} criticism`
+- `{topic} vs {alternative}`
+- `why not use {topic}`
+- `{topic} downsides`
+
+**Pass 5 — Source Triangulation**:
+For key facts (pricing, performance, features):
+- Verify from 2-3 independent sources
+- Note conflicting information explicitly
 
 #### Tools
 
 - **WebSearch**: Primary search tool for discovery
 - **WebFetch**: Deep reading of specific pages (docs, pricing, features)
 - **Context7**: Library/framework documentation lookup
-- **GitHub Search**: Ready-made solutions, reference implementations, popular libraries
-
-#### GitHub Search
-
-For existing solutions use WebSearch with `site:github.com`:
-- `{topic} stars:>100` — popular repos
-- `{topic} awesome` — curated lists
-
-Evaluate: stars, last commit, license. Extract: patterns, dependencies, project structure.
+- **Task**: Parallel subagent research for subtopics
 
 #### Atomic Writes
 
 After each significant block of findings, write to the research document:
-- Initial findings after broad discovery
-- Updated findings after gap analysis
-- Final findings after verification
+- After parallel agents complete
+- After each pass that yields new information
+- After gap analysis reveals new findings
+
+#### Stopping Criteria
+
+- All subtopics from Phase 0 covered
+- Key claims verified from multiple sources
+- Counter-arguments documented
+- New searches don't yield new information
+- User says "enough" / "хватит"
 
 ### Phase 3: Synthesis & Documentation
+
+#### Confidence Ratings
+
+Use emoji indicators for claim confidence throughout the document:
+- 🟢 **High**: 3+ sources, official docs, recent data (2024-2025)
+- 🟡 **Medium**: 1-2 sources, reasonably recent
+- 🔴 **Low/Unverified**: Single source, outdated, or conflicting info
+
+Apply ratings to key claims:
+```markdown
+- 🟢 Pricing starts at $10/month (official website, 2 reviews)
+- 🟡 Supports up to 10k req/sec (one benchmark, 2024)
+- 🔴 Planning to add feature X (single blog mention, unconfirmed)
+```
 
 Structure findings based on detected mode:
 
@@ -193,16 +272,35 @@ Structure findings based on detected mode:
 ### Phase 4: Finalize & Report
 
 1. Update document status to "Final"
-2. Compile **Sources** section with annotations:
+
+2. Add **Disputed/Unverified Claims** section (if any):
+   ```markdown
+   ## Disputed/Unverified Claims
+   - {Claim 1}: {why uncertain — conflicting sources, single mention, etc.}
+   - {Claim 2}: {needs verification — only found in one place}
+   ```
+
+3. Add **Research Metadata**:
+   ```markdown
+   ## Research Metadata
+   - **Sources consulted**: {N}
+   - **Search passes**: {N}
+   - **Subtopics covered**: {list}
+   - **Parallel agents used**: Yes/No
+   - **Research depth**: Deep / Standard
+   ```
+
+4. Compile **Sources** section with annotations:
    ```markdown
    ## Sources
    1. [{Title}]({URL}) - {brief annotation: why valuable}
    2. ...
    ```
 
-3. Report to user:
+5. Report to user:
    - Path to research document
    - Brief summary of key findings (3-5 bullet points)
+   - Highlight any disputed/unverified claims
    - Suggested next steps if applicable
 
 ## Rules

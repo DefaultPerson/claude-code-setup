@@ -1,9 +1,17 @@
 logs/
 *.log
 *.log.*
+
+# Pre-compact backups
+.claude/backups/
 # Envs & secrets
 .env
 .env.local
 
 .mcp.json
-!.claude/settings.local.json
+.claude/settings.local.json
+.claude/settings.json
+
+# Auto Claude data directory
+.auto-claude/
+.claude-diary/
