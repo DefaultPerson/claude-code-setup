@@ -6,10 +6,12 @@ Starter kit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) wi
 
 - **Security Guard** — blocks dangerous commands (`rm -rf /`, `.env` writes, privileged docker, etc.)
 - **TTS Notifications** — voice alerts when Claude finishes or needs input (ElevenLabs / OpenAI / pyttsx3)
+- **Desktop Notifications** — native OS notifications (Linux, macOS, Windows)
 - **Status Line** — shows project, branch, model, and context usage
 - **Pre-Compact Hook** — auto-saves session backup before context compaction
 - **Persistent Memory** — `.claude/memory.md` survives between sessions
 - **Slash Commands** — `/research`, `/ultrathink`, `/validation`
+- **Agents** — sandbox and worktree-dev for isolated parallel development
 - **MCP Servers** — context7, chrome-devtools
 - **LSP Plugins** — TypeScript, Python (Pyright), Go (gopls) for better code understanding
 - **Cross-platform** — Linux, macOS, Windows
