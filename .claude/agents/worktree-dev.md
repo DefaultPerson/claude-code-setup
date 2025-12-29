@@ -1,3 +1,8 @@
+---
+name: worktree-dev
+description: Development agent using git worktree for parallel feature work with optional dev server
+---
+
 # Worktree Development Agent
 
 Isolated development agent that works in a separate git worktree.

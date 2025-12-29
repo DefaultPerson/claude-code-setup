@@ -1,10 +1,17 @@
 {
   "hooks": {
+    "PreCompact": [{
+      "matcher": "",
+      "hooks": [{
+        "type": "command",
+        "command": "uv run .claude\\hooks\\pre_compact.py"
+      }]
+    }],
     "PreToolUse": [{
       "matcher": "Bash",
       "hooks": [{
         "type": "command",
-        "command": "python .claude\\hooks\\guard.py"
+        "command": "uv run .claude\\hooks\\guard.py"
       }]
     }],
     "Stop": [{
@@ -28,5 +35,13 @@
     "ask": []
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": []
+  "enabledMcpjsonServers": [],
+  "statusLine": {
+    "type": "command",
+    "command": "uv run .claude\\hooks\\statusline.py",
+    "padding": 0
+  },
+  "env": {
+    "CONTEXT7_API_KEY": "paste_your_token"
+  }
 }

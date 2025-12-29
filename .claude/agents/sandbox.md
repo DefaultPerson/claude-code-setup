@@ -1,3 +1,8 @@
+---
+name: sandbox
+description: Isolated agent that works in a separate git worktree for safe experimentation
+---
+
 # Sandbox Agent
 
 Isolated development agent that works in a separate git worktree.

@@ -42,6 +42,6 @@
     "padding": 0
   },
   "env": {
-    "CONTEXT7_API_KEY": "paste_youre_token"
+    "CONTEXT7_API_KEY": "paste_your_token"
   }
 }

@@ -9,8 +9,9 @@ Starter kit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) wi
 - **Status Line** — shows project, branch, model, and context usage
 - **Pre-Compact Hook** — auto-saves session backup before context compaction
 - **Persistent Memory** — `.claude/memory.md` survives between sessions
-- **Slash Commands** — `/research`, `/ultrathink`, `/load-context`, `/validation`
-- **MCP Servers** — context7, chrome-devtool
+- **Slash Commands** — `/research`, `/ultrathink`, `/validation`
+- **MCP Servers** — context7, chrome-devtools
+- **LSP Plugins** — TypeScript, Python (Pyright), Go (gopls) for better code understanding
 - **Cross-platform** — Linux, macOS, Windows
 
 ---
@@ -52,6 +53,20 @@ claude
 
 ---
 
+## LSP Plugins (Optional)
+
+Enable LSP for better code analysis (types, definitions, errors):
+
+```bash
+claude /install-plugin typescript-lsp@claude-plugins-official
+claude /install-plugin pyright-lsp@claude-plugins-official
+claude /install-plugin gopls-lsp@claude-plugins-official
+```
+
+Requires language servers installed: `npm i -g typescript`, `pip install pyright`, `go install golang.org/x/tools/gopls@latest`.
+
+---
+
 ## Global Installation (Optional)
 
 Apply hooks to **all projects**:
@@ -75,9 +90,12 @@ alias ccp='CLAUDE_CONFIG_DIR=$HOME/.claude-personal claude'
 alias ccd='claude --dangerously-skip-permissions'
 alias ccdr='claude --dangerously-skip-permissions --resume'
 
-# Tmux grid for parallel sessions
+# Tmux grid: tg (4 panes), tg -n 3 (3 panes)
 tg() {
-    n=${1:-2}
+    local n=4
+    while getopts "n:" opt; do
+        case $opt in n) n=$OPTARG ;; esac
+    done
     tmux new-session -d -s "grid-$$"
     for ((i=1; i<n; i++)); do
         tmux split-window -t "grid-$$"
@@ -86,11 +104,20 @@ tg() {
     tmux attach -t "grid-$$"
 }
 
+# 2 panes side-by-side
+tg2() {
+    tmux new-session -d -s "split-$$"
+    tmux split-window -h -t "split-$$"
+    tmux attach -t "split-$$"
+}
+
 # Add pane to current grid
 ta() {
     tmux split-window
     tmux select-layout tiled
 }
+
+alias tg3='tg -n 3'
 ```
 
 ---

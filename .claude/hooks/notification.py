@@ -14,6 +14,7 @@ Used as a Stop (post-response) hook.
 
 import json
 import os
+import platform
 import random
 import shutil
 import subprocess
@@ -48,12 +49,144 @@ MESSAGES = {
 
 # Random completion phrases (en only) - full messages for caching
 COMPLETION_PHRASES_EN = [
-    "Work complete! The AI Agent has finished its work. Awaiting your instructions.",
+    "Work complete! Awaiting your instructions.",
     "All done! Awaiting your instructions.",
     "Task finished! Awaiting your instructions.",
     "Job complete! The AI Agent has finished its work.",
     "The AI Agent has finished its work. Ready for next task!",
 ]
+
+# Desktop notification titles
+NOTIFICATION_TITLES = {
+    "ru": {
+        "ready": "Claude Code — Готово",
+        "permission": "Claude Code — Внимание",
+        "idle": "Claude Code",
+    },
+    "en": {
+        "ready": "Claude Code — Complete",
+        "permission": "Claude Code — Attention",
+        "idle": "Claude Code",
+    },
+}
+
+
+# =============================================================================
+# Desktop Notifications (cross-platform)
+# =============================================================================
+
+
+def get_desktop_notifications_enabled() -> bool:
+    """Check if desktop notifications are enabled via DESKTOP_NOTIFICATIONS env var."""
+    return os.getenv("DESKTOP_NOTIFICATIONS", "true").lower() in ("true", "1", "yes")
+
+
+def send_desktop_notification(title: str, message: str) -> bool:
+    """
+    Send a desktop notification. Returns True if successful.
+    Uses native tools per platform (no external dependencies).
+    """
+    if not get_desktop_notifications_enabled():
+        return False
+
+    system = platform.system()
+    try:
+        if system == "Linux":
+            return _notify_linux(title, message)
+        elif system == "Darwin":
+            return _notify_macos(title, message)
+        elif system == "Windows":
+            return _notify_windows(title, message)
+    except Exception:
+        pass
+    return False
+
+
+def _notify_linux(title: str, message: str) -> bool:
+    """Linux: notify-send (libnotify)."""
+    if not shutil.which("notify-send"):
+        return False
+    try:
+        subprocess.run(
+            ["notify-send", "-a", "Claude Code", title, message],
+            check=True,
+            capture_output=True,
+            timeout=5,
+        )
+        return True
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return False
+
+
+def _notify_macos(title: str, message: str) -> bool:
+    """macOS: osascript with AppleScript."""
+    # Escape special characters for AppleScript
+    title_esc = title.replace("\\", "\\\\").replace('"', '\\"')
+    message_esc = message.replace("\\", "\\\\").replace('"', '\\"')
+    script = f'display notification "{message_esc}" with title "{title_esc}"'
+    try:
+        subprocess.run(
+            ["osascript", "-e", script],
+            check=True,
+            capture_output=True,
+            timeout=5,
+        )
+        return True
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
+        return False
+
+
+def _notify_windows(title: str, message: str) -> bool:
+    """Windows: PowerShell Toast (Win10+) with Balloon fallback (Win7-8)."""
+    # Escape for PowerShell single-quoted strings
+    title_esc = title.replace("'", "''")
+    message_esc = message.replace("'", "''")
+
+    # Try modern Toast notification first (Windows 10+)
+    toast_script = f"""
+[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
+$template = [Windows.UI.Notifications.ToastTemplateType]::ToastText02
+$xml = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent($template)
+$nodes = $xml.GetElementsByTagName('text')
+$nodes.Item(0).AppendChild($xml.CreateTextNode('{title_esc}')) | Out-Null
+$nodes.Item(1).AppendChild($xml.CreateTextNode('{message_esc}')) | Out-Null
+$toast = [Windows.UI.Notifications.ToastNotification]::new($xml)
+$notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('Claude Code')
+$notifier.Show($toast)
+"""
+    try:
+        result = subprocess.run(
+            ["powershell", "-NoProfile", "-NonInteractive", "-Command", toast_script],
+            capture_output=True,
+            timeout=10,
+        )
+        if result.returncode == 0:
+            return True
+    except (subprocess.TimeoutExpired, FileNotFoundError):
+        pass
+
+    # Fallback: Balloon notification (Windows 7/8 or if Toast fails)
+    balloon_script = f"""
+Add-Type -AssemblyName System.Windows.Forms
+$notify = New-Object System.Windows.Forms.NotifyIcon
+$notify.Icon = [System.Drawing.SystemIcons]::Information
+$notify.Visible = $true
+$notify.BalloonTipTitle = '{title_esc}'
+$notify.BalloonTipText = '{message_esc}'
+$notify.ShowBalloonTip(5000)
+Start-Sleep -Milliseconds 200
+$notify.Dispose()
+"""
+    try:
+        subprocess.run(
+            ["powershell", "-NoProfile", "-NonInteractive", "-Command", balloon_script],
+            check=True,
+            capture_output=True,
+            timeout=10,
+        )
+        return True
+    except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
+        return False
 
 
 def get_language() -> str:
@@ -175,8 +308,19 @@ def get_tts_script_path() -> Path | None:
     return None
 
 
-def announce_notification(message: str, is_static: bool = True) -> None:
-    """Announces a message via TTS."""
+def announce_notification(
+    message: str,
+    is_static: bool = True,
+    notification_type: str = "ready",
+    lang: str = "en",
+) -> None:
+    """Announces a message via TTS and desktop notification."""
+    # Send desktop notification
+    titles = NOTIFICATION_TITLES.get(lang, NOTIFICATION_TITLES["en"])
+    title = titles.get(notification_type, titles["ready"])
+    send_desktop_notification(title, message)
+
+    # Play TTS
     if is_static and check_and_play_cache(message):
         return
     tts_script = get_tts_script_path()
@@ -205,11 +349,11 @@ def main():
     msgs = MESSAGES[lang]
 
     if permission:
-        notification_type = input_data.get("notification_type", "")
-        if notification_type == "idle_prompt":
-            announce_notification(msgs["idle"], is_static=True)
+        notif_type = input_data.get("notification_type", "")
+        if notif_type == "idle_prompt":
+            announce_notification(msgs["idle"], is_static=True, notification_type="idle", lang=lang)
             sys.exit(0)
-        announce_notification(msgs["permission"], is_static=True)
+        announce_notification(msgs["permission"], is_static=True, notification_type="permission", lang=lang)
         sys.exit(0)
 
     if notify:
@@ -223,15 +367,15 @@ def main():
                     if last_response:
                         message = generate_summary(last_response, lang)
                 if message:
-                    announce_notification(message, is_static=False)
+                    announce_notification(message, is_static=False, notification_type="ready", lang=lang)
                 else:
-                    announce_notification(msgs["ready"], is_static=True)
+                    announce_notification(msgs["ready"], is_static=True, notification_type="ready", lang=lang)
             else:
                 if lang == "en":
                     message = random.choice(COMPLETION_PHRASES_EN)
-                    announce_notification(message, is_static=True)
+                    announce_notification(message, is_static=True, notification_type="ready", lang=lang)
                 else:
-                    announce_notification(msgs["ready"], is_static=True)
+                    announce_notification(msgs["ready"], is_static=True, notification_type="ready", lang=lang)
 
     sys.exit(0)
 

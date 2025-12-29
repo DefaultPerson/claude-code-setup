@@ -12,6 +12,10 @@ logs/
 .claude/settings.local.json
 .claude/settings.json
 
+# Python cache
+__pycache__/
+*.pyc
+
 # Auto Claude data directory
 .auto-claude/
 .claude-diary/

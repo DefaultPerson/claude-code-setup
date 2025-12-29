@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """Claude Code status line: dir >> branch >> model >> context%"""
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
+
 
 def get_branch(project_dir: str) -> str:
     try:
@@ -14,6 +16,7 @@ def get_branch(project_dir: str) -> str:
         return result.stdout.strip() if result.returncode == 0 else ""
     except:
         return ""
+
 
 def get_context_usage(transcript_path: str, context_limit: int) -> str:
     """Parse transcript to get context usage percentage."""
@@ -44,7 +47,7 @@ def get_context_usage(transcript_path: str, context_limit: int) -> str:
 
         pct = (last_input / limit) * 100
 
-        # Color based on usage (system prompt + tools overhead)
+        # Color based on usage (system prompt + tools overhead ~15%)
         total_pct = pct + 15
         if total_pct < 50:
             color = "\033[32m"  # green
@@ -53,18 +56,24 @@ def get_context_usage(transcript_path: str, context_limit: int) -> str:
         else:
             color = "\033[31m"  # red
 
-        D = "\033[2m"  # dim
         R = "\033[0m"  # reset
-        return f"{color}{pct:.0f}%{D}(+overhead){R}"
+        return f"{color}{pct:.0f}%+{R}"
     except:
         return ""
 
+
 def main():
     try:
-        data = json.loads(sys.stdin.read())
+        raw = sys.stdin.read()
+        data = json.loads(raw)
     except:
         print("⚠ parse error")
         return
+
+    # Debug: dump input to file (set DEBUG_STATUSLINE=1)
+    if os.getenv("DEBUG_STATUSLINE"):
+        debug_path = Path("/tmp/claude-statusline-debug.json")
+        debug_path.write_text(json.dumps(data, indent=2, default=str))
 
     project_dir = data.get("workspace", {}).get("project_dir", "")
     model = data.get("model", {}).get("display_name", "?")
@@ -75,7 +84,7 @@ def main():
     # Project folder name
     folder = Path(project_dir).name if project_dir else "?"
 
-    # Context usage (limit from context_window)
+    # Context usage
     ctx = get_context_usage(transcript_path, context_limit)
 
     # ANSI colors
