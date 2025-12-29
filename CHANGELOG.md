@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2025-12-29
+
+### Added
+
+- **Desktop Notifications** — cross-platform native notifications (Linux `notify-send`, macOS `osascript`, Windows PowerShell Toast)
+- **`DESKTOP_NOTIFICATIONS`** — env variable to enable/disable (default: true)
+- **`DEBUG_STATUSLINE`** — env variable to dump statusline input to `/tmp/claude-statusline-debug.json`
+- **`tg2`** — tmux alias for 2 horizontal panes (side-by-side)
+- **`tg3`** — tmux alias for 3 panes
+
+### Changed
+
+- **statusline.py** — context display changed from `~X%` to `X%+` format
+- **notification.py** — integrated desktop notifications with TTS
+- **Agents** — added required `description` field to frontmatter (sandbox, worktree-dev)
+- **README.md** — updated tmux aliases section with tg2/tg3
+
+### Removed
+
+- **`/load-context`** — removed slash command (use memory.md directly)
+
 ## [0.2.0] - 2025-12-27
 
 ### Added
