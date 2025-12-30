@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2025-12-30
+
+### Added
+
+- **HTML Session Viewer** — `pre_compact.py` now generates standalone HTML with markdown rendering, syntax highlighting, and copy buttons per message
+- **Notification Stacking Prevention** — desktop notifications replace each other instead of accumulating:
+  - Linux: `x-canonical-private-synchronous` and `x-dunst-stack-tag` hints
+  - macOS: `terminal-notifier` with `-group` (if installed)
+  - Windows: Toast `Tag` and `Group` properties
+- **LSP Plugins Section** — README now documents TypeScript, Python (Pyright), Go (gopls) plugins
+
+### Changed
+
+- **CLAUDE.md** — optimized from 128 to 61 lines, merged `dev_guidelines` and `cursor_prefs`, removed redundant sections
+- **README.md** — streamlined features list, updated Pre-Compact Hook description
+- **.mcp.json.windows** — fixed context7 config to use `env` instead of `--api-key` arg
+- **.claude/settings.local.json.windows** — added missing PreCompact and statusLine hooks
+- **.env.example** — added `DESKTOP_NOTIFICATIONS` variable
+
+### Removed
+
+- **Persistent Memory** — removed `.claude/memory.md` and related CLAUDE.md section
+- **Agents** — removed `sandbox.md` and `worktree-dev.md` (use built-in Task tool instead)
+- **`/load-context`** — removed slash command
+
+### Fixed
+
+- **.claude/settings.example.json** — typo `youre` → `your`
+
 ## [0.3.0] - 2025-12-29
 
 ### Added

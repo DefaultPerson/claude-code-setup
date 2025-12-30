@@ -103,12 +103,21 @@ def send_desktop_notification(title: str, message: str) -> bool:
 
 
 def _notify_linux(title: str, message: str) -> bool:
-    """Linux: notify-send (libnotify)."""
+    """Linux: notify-send (libnotify) with replace to avoid stacking."""
     if not shutil.which("notify-send"):
         return False
     try:
+        # Use hint for notification replacement (works with most notification daemons)
+        # x-canonical-private-synchronous replaces notifications with same tag
         subprocess.run(
-            ["notify-send", "-a", "Claude Code", title, message],
+            [
+                "notify-send",
+                "-a", "Claude Code",
+                "-h", "string:x-canonical-private-synchronous:claude-code",
+                "-h", "string:x-dunst-stack-tag:claude-code",  # For Dunst users
+                title,
+                message,
+            ],
             check=True,
             capture_output=True,
             timeout=5,
@@ -119,8 +128,36 @@ def _notify_linux(title: str, message: str) -> bool:
 
 
 def _notify_macos(title: str, message: str) -> bool:
-    """macOS: osascript with AppleScript."""
-    # Escape special characters for AppleScript
+    """macOS: terminal-notifier (if available) or AppleScript fallback."""
+    # Try terminal-notifier first (supports click-to-activate and grouping)
+    if shutil.which("terminal-notifier"):
+        try:
+            # Get the frontmost app to activate on click
+            result = subprocess.run(
+                ["osascript", "-e", 'tell application "System Events" to get name of first process whose frontmost is true'],
+                capture_output=True,
+                text=True,
+                timeout=2,
+            )
+            front_app = result.stdout.strip() if result.returncode == 0 else "Terminal"
+
+            subprocess.run(
+                [
+                    "terminal-notifier",
+                    "-title", title,
+                    "-message", message,
+                    "-group", "claude-code",  # Replaces previous notification
+                    "-activate", f"com.apple.{front_app.lower().replace(' ', '')}",
+                ],
+                check=True,
+                capture_output=True,
+                timeout=5,
+            )
+            return True
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            pass
+
+    # Fallback: AppleScript (no click action, no grouping)
     title_esc = title.replace("\\", "\\\\").replace('"', '\\"')
     message_esc = message.replace("\\", "\\\\").replace('"', '\\"')
     script = f'display notification "{message_esc}" with title "{title_esc}"'
@@ -143,6 +180,7 @@ def _notify_windows(title: str, message: str) -> bool:
     message_esc = message.replace("'", "''")
 
     # Try modern Toast notification first (Windows 10+)
+    # Tag and Group ensure notifications replace each other instead of stacking
     toast_script = f"""
 [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
 $template = [Windows.UI.Notifications.ToastTemplateType]::ToastText02
@@ -151,6 +189,8 @@ $nodes = $xml.GetElementsByTagName('text')
 $nodes.Item(0).AppendChild($xml.CreateTextNode('{title_esc}')) | Out-Null
 $nodes.Item(1).AppendChild($xml.CreateTextNode('{message_esc}')) | Out-Null
 $toast = [Windows.UI.Notifications.ToastNotification]::new($xml)
+$toast.Tag = 'claude-code'
+$toast.Group = 'claude-code'
 $notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('Claude Code')
 $notifier.Show($toast)
 """
