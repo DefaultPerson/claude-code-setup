@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - **.claude/settings.example.json** — typo `youre` → `your`
+- **pre_compact.py** — user messages rendered character-by-character when `content` was string instead of array
 
 ## [0.3.0] - 2025-12-29
 

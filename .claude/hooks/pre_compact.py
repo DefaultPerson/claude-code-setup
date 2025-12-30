@@ -159,7 +159,7 @@ body {{
 </div>
 <script>
 function copyMessage(btn, id) {{
-  const el = document.getElementById(id);
+  const el = document.getElementById(id).querySelector('.content');
   const text = el.getAttribute('data-raw');
   navigator.clipboard.writeText(text).then(() => {{
     btn.textContent = 'Copied!';
@@ -317,11 +317,15 @@ def extract_messages(transcript_path: str) -> list[dict]:
                         message = entry.get('message', {})
                         content = message.get('content', [])
                         text_parts = []
-                        for item in content:
-                            if isinstance(item, dict) and item.get('type') == 'text':
-                                text_parts.append(item.get('text', ''))
-                            elif isinstance(item, str):
-                                text_parts.append(item)
+                        # Handle content being a string directly
+                        if isinstance(content, str):
+                            text_parts.append(content)
+                        elif isinstance(content, list):
+                            for item in content:
+                                if isinstance(item, dict) and item.get('type') == 'text':
+                                    text_parts.append(item.get('text', ''))
+                                elif isinstance(item, str):
+                                    text_parts.append(item)
                         if text_parts:
                             messages.append({
                                 'role': msg_type,
@@ -341,7 +345,7 @@ def generate_html(messages: list[dict], session_id: str, trigger: str) -> str:
         role = msg['role']
         content = msg['content']
         content_html = parse_markdown(content)
-        raw_escaped = html.escape(content).replace('"', '&quot;')
+        raw_escaped = html.escape(content).replace('"', '&quot;').replace('\n', '&#10;')
 
         messages_html.append(MESSAGE_TEMPLATE.format(
             role=role,
