@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - **HTML Session Viewer** — `pre_compact.py` now generates standalone HTML with markdown rendering, syntax highlighting, and copy buttons per message
+- **Theme Toggle** — session viewer supports dark/light theme switching with localStorage persistence (dark default)
 - **Notification Stacking Prevention** — desktop notifications replace each other instead of accumulating:
   - Linux: `x-canonical-private-synchronous` and `x-dunst-stack-tag` hints
   - macOS: `terminal-notifier` with `-group` (if installed)
