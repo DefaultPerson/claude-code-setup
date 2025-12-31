@@ -26,13 +26,53 @@ HTML_TEMPLATE = '''<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Session {session_id} | {date}</title>
 <style>
+/* Dark theme (default) */
 :root {{
+  --bg: #0d1117;
+  --text: #e6edf3;
+  --header-bg: #161b22;
+  --message-bg: #161b22;
+  --user-bg: #1c2a3a;
+  --user-border: #58a6ff;
+  --assistant-bg: #21262d;
+  --assistant-border: #8b949e;
+  --code-bg: #0d1117;
+  --code-text: #e6edf3;
+  --code-inline-bg: #343942;
+  --border-color: #30363d;
+  --meta-color: #8b949e;
+  --link-color: #58a6ff;
+  --btn-bg: #21262d;
+  --btn-border: #30363d;
+  --btn-hover: #30363d;
+  --blockquote-border: #30363d;
+  --blockquote-color: #8b949e;
+  --table-border: #30363d;
+  --table-header-bg: #161b22;
+}}
+/* Light theme */
+[data-theme="light"] {{
+  --bg: #fafafa;
+  --text: #24292f;
+  --header-bg: #fff;
+  --message-bg: #fff;
   --user-bg: #e3f2fd;
   --user-border: #1976d2;
   --assistant-bg: #f5f5f5;
   --assistant-border: #616161;
   --code-bg: #1e1e1e;
   --code-text: #d4d4d4;
+  --code-inline-bg: #e8e8e8;
+  --border-color: #d0d7de;
+  --meta-color: #666;
+  --link-color: #1976d2;
+  --btn-bg: #fff;
+  --btn-border: #ddd;
+  --btn-hover: #f0f0f0;
+  --blockquote-border: #ddd;
+  --blockquote-color: #666;
+  --table-border: #ddd;
+  --table-header-bg: #f5f5f5;
 }}
 * {{ box-sizing: border-box; }}
 body {{
@@ -40,26 +80,45 @@ body {{
   max-width: 900px;
   margin: 0 auto;
   padding: 20px;
-  background: #fafafa;
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.6;
+  transition: background 0.3s, color 0.3s;
 }}
 .header {{
-  background: #fff;
+  background: var(--header-bg);
   padding: 15px 20px;
   border-radius: 8px;
   margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  border: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
 }}
+.header-content {{ flex: 1; }}
 .header h1 {{ margin: 0 0 10px; font-size: 1.4em; }}
-.meta {{ color: #666; font-size: 0.9em; }}
+.meta {{ color: var(--meta-color); font-size: 0.9em; }}
+.theme-toggle {{
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 1.2em;
+  transition: background 0.2s;
+}}
+.theme-toggle:hover {{ background: var(--btn-hover); }}
 .message {{
-  background: #fff;
+  background: var(--message-bg);
   border-radius: 8px;
   padding: 15px 20px;
   margin-bottom: 15px;
   border-left: 4px solid;
   position: relative;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  border: 1px solid var(--border-color);
+  border-left-width: 4px;
 }}
 .message.user {{
   background: var(--user-bg);
@@ -74,23 +133,24 @@ body {{
   font-size: 0.85em;
   text-transform: uppercase;
   margin-bottom: 10px;
-  color: #555;
+  color: var(--meta-color);
 }}
 .copy-btn {{
   position: absolute;
   top: 10px;
   right: 10px;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
   border-radius: 4px;
   padding: 4px 10px;
   cursor: pointer;
   font-size: 0.8em;
+  color: var(--text);
   opacity: 0.7;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, background 0.2s;
 }}
-.copy-btn:hover {{ opacity: 1; background: #f0f0f0; }}
-.copy-btn.copied {{ background: #4caf50; color: #fff; border-color: #4caf50; }}
+.copy-btn:hover {{ opacity: 1; background: var(--btn-hover); }}
+.copy-btn.copied {{ background: #238636; color: #fff; border-color: #238636; }}
 .content {{ word-wrap: break-word; }}
 .content h1, .content h2, .content h3 {{ margin: 0.8em 0 0.4em; }}
 .content h1 {{ font-size: 1.4em; }}
@@ -99,7 +159,7 @@ body {{
 .content p {{ margin: 0.5em 0; }}
 .content ul, .content ol {{ margin: 0.5em 0; padding-left: 1.5em; }}
 .content code {{
-  background: #e8e8e8;
+  background: var(--code-inline-bg);
   padding: 2px 6px;
   border-radius: 3px;
   font-family: 'SF Mono', Consolas, monospace;
@@ -119,23 +179,23 @@ body {{
   color: inherit;
 }}
 .content blockquote {{
-  border-left: 3px solid #ddd;
+  border-left: 3px solid var(--blockquote-border);
   margin: 0.5em 0;
   padding-left: 15px;
-  color: #666;
+  color: var(--blockquote-color);
 }}
-.content a {{ color: #1976d2; }}
+.content a {{ color: var(--link-color); }}
 .content table {{
   border-collapse: collapse;
   margin: 0.8em 0;
   width: 100%;
 }}
 .content th, .content td {{
-  border: 1px solid #ddd;
+  border: 1px solid var(--table-border);
   padding: 8px 12px;
   text-align: left;
 }}
-.content th {{ background: #f5f5f5; }}
+.content th {{ background: var(--table-header-bg); }}
 /* Syntax highlighting */
 .kw {{ color: #569cd6; }}
 .str {{ color: #ce9178; }}
@@ -146,18 +206,56 @@ body {{
 </head>
 <body>
 <div class="header">
-  <h1>Session Backup</h1>
-  <div class="meta">
-    <strong>Session:</strong> {session_id}<br>
-    <strong>Date:</strong> {date}<br>
-    <strong>Trigger:</strong> {trigger}<br>
-    <strong>Messages:</strong> {message_count}
+  <div class="header-content">
+    <h1>Session Backup</h1>
+    <div class="meta">
+      <strong>Session:</strong> {session_id}<br>
+      <strong>Date:</strong> {date}<br>
+      <strong>Trigger:</strong> {trigger}<br>
+      <strong>Messages:</strong> {message_count}
+    </div>
   </div>
+  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
 </div>
 <div class="messages">
 {messages_html}
 </div>
 <script>
+// Theme management
+(function() {{
+  const saved = localStorage.getItem('session-viewer-theme');
+  if (saved === 'light') {{
+    document.documentElement.setAttribute('data-theme', 'light');
+  }}
+  // Dark is default, no attribute needed
+}})();
+
+function toggleTheme() {{
+  const html = document.documentElement;
+  const btn = document.querySelector('.theme-toggle');
+  const isLight = html.getAttribute('data-theme') === 'light';
+
+  if (isLight) {{
+    html.removeAttribute('data-theme');
+    localStorage.setItem('session-viewer-theme', 'dark');
+    btn.textContent = '🌙';
+    btn.title = 'Switch to light theme';
+  }} else {{
+    html.setAttribute('data-theme', 'light');
+    localStorage.setItem('session-viewer-theme', 'light');
+    btn.textContent = '☀️';
+    btn.title = 'Switch to dark theme';
+  }}
+}}
+
+// Update button state on load
+document.addEventListener('DOMContentLoaded', function() {{
+  const btn = document.querySelector('.theme-toggle');
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  btn.textContent = isLight ? '☀️' : '🌙';
+  btn.title = isLight ? 'Switch to dark theme' : 'Switch to light theme';
+}});
+
 function copyMessage(btn, id) {{
   const el = document.getElementById(id).querySelector('.content');
   const text = el.getAttribute('data-raw');
