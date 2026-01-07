@@ -43,6 +43,8 @@ correctness → security → performance → maintainability → DX
 
 ## If Uncertain
 State assumptions explicitly. Propose safe default + how to verify quickly.
+
+NEVER ADD CLAUDE TO CONTRIBUTORS
 </dev_guidelines>
 
 <example>

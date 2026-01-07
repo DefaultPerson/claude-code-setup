@@ -231,8 +231,8 @@ $notify.Dispose()
 
 def get_language() -> str:
     """Returns language from TTS_LANGUAGE or 'ru' by default."""
-    lang = os.getenv("TTS_LANGUAGE", "ru").lower()
-    return lang if lang in MESSAGES else "ru"
+    lang = os.getenv("TTS_LANGUAGE", "en").lower()
+    return lang if lang in MESSAGES else "en"
 
 
 def get_mode() -> str:
