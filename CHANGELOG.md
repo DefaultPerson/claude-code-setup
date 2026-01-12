@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- **CLAUDE.md** — added rule to prevent Co-Authored-By in commits
+
 ## [0.4.0] - 2025-12-30
 
 ### Added

@@ -45,6 +45,7 @@ correctness → security → performance → maintainability → DX
 State assumptions explicitly. Propose safe default + how to verify quickly.
 
 NEVER ADD CLAUDE TO CONTRIBUTORS
+NEVER ADD Co-Authored-By TO COMMITS
 </dev_guidelines>
 
 <example>
