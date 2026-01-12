@@ -86,7 +86,6 @@ Add to `.bashrc` / `.zshrc` / PowerShell profile:
 ```bash
 alias cc="claude"
 alias ccr="claude --resume"
-alias ccp='CLAUDE_CONFIG_DIR=$HOME/.claude-personal claude'
 alias ccd='claude --dangerously-skip-permissions'
 alias ccdr='claude --dangerously-skip-permissions --resume'
 

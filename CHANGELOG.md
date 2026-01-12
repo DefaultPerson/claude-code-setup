@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - **CLAUDE.md** — added rule to prevent Co-Authored-By in commits
+- **CLAUDE.md** — merged `coding-standards.md` and `tooling.md` inline (guaranteed context loading)
+- **README.md** — moved from `docs/` to repository root
+
+### Removed
+
+- **docs/** — folder removed; content consolidated into CLAUDE.md and root README
 
 ## [0.4.0] - 2025-12-30
 
