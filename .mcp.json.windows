@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "context7": {
-      "command": "npx.cmd",
+      "command": "C:\\Program Files\\nodejs\\npx.cmd",
       "args": ["-y", "@upstash/context7-mcp"],
       "env": {
         "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"

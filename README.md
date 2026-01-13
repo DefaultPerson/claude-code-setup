@@ -67,7 +67,7 @@ Requires language servers installed: `npm i -g typescript`, `pip install pyright
 
 ---
 
-## Global Installation (Optional)
+## Global Installation (Optional+Recomended)
 
 Apply hooks to **all projects**:
 
