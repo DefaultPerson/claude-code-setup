@@ -143,4 +143,4 @@ alias tg3='tg -n 3'
 
 ---
 
-My tg channel >> [link](https://t.me/agentSShit)
+🤙 My tg channel >> [link](https://t.me/agentSShit)
