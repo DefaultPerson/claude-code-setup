@@ -1,8 +1,20 @@
 # Claude Code Setup
 
-Starter kit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) with hooks, MCP servers, and productivity tools.
+My universal setup for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) with hooks, MCPs, etc...
 
-## Features
+## 📑 Contents
+
+- [Claude Code Setup](#claude-code-setup)
+  - [📑 Contents](#-contents)
+  - [🚀 Features](#-features)
+  - [📋 Prerequisites](#-prerequisites)
+  - [⚡ Quick Start](#-quick-start)
+  - [🔌 LSP Plugins (Optional)](#-lsp-plugins-optional)
+  - [🌍 Global Installation (Optional+Recommended)](#-global-installation-optionalrecommended)
+  - [💻 Shell Aliases (Optional)](#-shell-aliases-optional)
+  - [💡 Tips](#-tips)
+
+## 🚀 Features
 
 - **Security Guard** — blocks dangerous commands (`rm -rf /`, `.env` writes, privileged docker, etc.)
 - **TTS Notifications** — voice alerts when Claude finishes or needs input (ElevenLabs / OpenAI / pyttsx3)
@@ -16,7 +28,7 @@ Starter kit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) wi
 
 ---
 
-## Prerequisites
+## 📋 Prerequisites
 
 - **Node.js** 18+
 - **uv** (Python package manager)
@@ -25,7 +37,7 @@ Starter kit for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) wi
 
 ---
 
-## Quick Start
+## ⚡ Quick Start
 
 ```bash
 git clone https://github.com/user/claude-code-setup.git
@@ -53,7 +65,7 @@ claude
 
 ---
 
-## LSP Plugins (Optional)
+## 🔌 LSP Plugins (Optional)
 
 Enable LSP for better code analysis (types, definitions, errors):
 
@@ -67,7 +79,7 @@ Requires language servers installed: `npm i -g typescript`, `pip install pyright
 
 ---
 
-## Global Installation (Optional+Recomended)
+## 🌍 Global Installation (Optional+Recommended)
 
 Apply hooks to **all projects**:
 
@@ -79,7 +91,7 @@ sed -i 's|/home/user/project/.claude|'"$HOME"'/.claude|g' ~/.claude/settings.jso
 
 ---
 
-## Shell Aliases (Optional)
+## 💻 Shell Aliases (Optional)
 
 Add to `.bashrc` / `.zshrc` / PowerShell profile:
 
@@ -121,24 +133,14 @@ alias tg3='tg -n 3'
 
 ---
 
-## Tips
+## 💡 Tips
 
-**Terminal as Editor Tab (VS Code)**: `Cmd/Ctrl+Shift+P` → "Terminal: Create New Terminal in Editor Area" — opens terminal as a tab next to your code, not in the bottom panel.
+> [!TIP]
+> **Terminal as Editor Tab (VS Code)**: `Cmd/Ctrl+Shift+P` → "Terminal: Create New Terminal in Editor Area" — opens terminal as a tab next to your code, not in the bottom panel.
 
----
-
-## Troubleshooting
-
-If something doesn't work — just ask Claude Code to fix it. Describe the problem and Claude will diagnose and resolve it.
+> [!TIP]
+> **If something doesn't work — just ask Claude Code to fix it.** Describe the problem and Claude will diagnose and resolve it.
 
 ---
 
-## References
-
-- [disler/claude-code-hooks-mastery](https://github.com/disler/claude-code-hooks-mastery)
-- [coleam00/context-engineering-intro](https://github.com/coleam00/context-engineering-intro)
-- [DenisSergeevitch/chatgpt-custom-instructions](https://github.com/DenisSergeevitch/chatgpt-custom-instructions)
-
----
-
-My tg channel >> [@agentSShit](https://t.me/agentSShit)
+My tg channel >> [link](https://t.me/agentSShit)
