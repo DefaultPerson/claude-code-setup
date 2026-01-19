@@ -13,6 +13,7 @@ My universal setup for [Claude Code](https://docs.anthropic.com/en/docs/claude-c
   - [🌍 Global Installation (Optional+Recommended)](#-global-installation-optionalrecommended)
   - [💻 Shell Aliases (Optional)](#-shell-aliases-optional)
   - [💡 Tips](#-tips)
+  - [🌐 Agent Browser](#-agent-browser)
 
 ## 🚀 Features
 
@@ -140,6 +141,12 @@ alias tg3='tg -n 3'
 
 > [!TIP]
 > **If something doesn't work — just ask Claude Code to fix it.** Describe the problem and Claude will diagnose and resolve it.
+
+---
+
+## 🌐 Agent Browser
+
+Better alternative to Playwright MCP: **[agent-browser](https://github.com/vercel-labs/agent-browser)** | [skill](https://github.com/vercel-labs/agent-browser/tree/main/skills/agent-browser)
 
 ---
 
