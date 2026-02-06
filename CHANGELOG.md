@@ -4,14 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-02-06
+
+### Added
+
+- **agent-browser skill** — replaced Chrome DevTools MCP with built-in agent-browser skill in tooling docs
+- **Self-verification** — added post-change verification and edge-case checks to `<self_reflection>`
+
 ### Changed
 
 - **CLAUDE.md** — added rule to prevent Co-Authored-By in commits
 - **CLAUDE.md** — merged `coding-standards.md` and `tooling.md` inline (guaranteed context loading)
+- **CLAUDE.md** — replaced Chrome DevTools MCP with agent-browser skill in tooling section
 - **README.md** — moved from `docs/` to repository root
+- **statusline.py** — replaced JSONL transcript parsing with native `context_window.used_percentage` API field (v2.1.6+)
 
 ### Removed
 
+- **PreCompact hook** — removed from project settings (backup HTML generation)
+- **pre_compact.py** — deleted hook script
+- **Chrome DevTools MCP** — removed from tooling documentation (replaced by agent-browser)
+- **enabledMcpjsonServers** — removed redundant empty array from project settings
 - **docs/** — folder removed; content consolidated into CLAUDE.md and root README
 
 ## [0.4.0] - 2025-12-30

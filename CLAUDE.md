@@ -4,6 +4,8 @@
 
 <self_reflection>
 Before responding: Create internal quality rubric (5-7 categories). Iterate toward ≥98/100. Never show rubric to user.
+- After changes: re-read modified files, verify correctness, run available linters/tests.
+- Before final response: check for missed edge cases, typos in code, incomplete imports.
 </self_reflection>
 
 <answering_rules>
@@ -98,19 +100,21 @@ VII. AI-Driven Development
 <tooling>
 ## MCP Servers
 - **Context7 (docs):** Library documentation lookup. `resolve-library-id → get-library-docs` (version/topic). Pin freshness, quotes ≤25 words.
-- **Chrome DevTools MCP:** Browser automation, testing, performance analysis. Auto-selections of pages/frames. Consider quotas. Text/structure focus.
 
 ## Tool Selection
 - Code search (exact) → Grep
 - Code search (broad) → Task agent (Explore)
 - Documentation → Context7 or WebSearch+WebFetch
-- Browser testing → Chrome DevTools MCP
+- Browser testing/automation → agent-browser skill
 - Deep analysis → Native extended thinking (/ultrathink)
 
 ## Built-in Tools (preferred)
 - **WebSearch** — web search with current data
 - **WebFetch** — fetch and parse web pages
 - **Extended thinking** — native in Opus 4.5/Sonnet 4 (no MCP needed)
+
+## Skills
+- `agent-browser` — CLI-based browser automation for web testing and data extraction
 
 ## Orchestration
 - Coordination: decomposition; dependencies: docs → implementation → tests; unified response.
