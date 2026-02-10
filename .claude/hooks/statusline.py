@@ -18,25 +18,59 @@ def get_branch(project_dir: str) -> str:
         return ""
 
 
-def get_context_usage(data: dict) -> str:
-    """Get context usage from native context_window.used_percentage field."""
+def get_context_info(transcript_path: str, context_limit: int) -> dict:
+    """Parse transcript to get context usage info."""
     try:
-        pct = data.get("context_window", {}).get("used_percentage")
-        if pct is None:
-            return ""
+        if not transcript_path or not Path(transcript_path).exists():
+            return {}
 
-        # Color based on usage
-        if pct < 50:
-            color = "\033[32m"  # green
-        elif pct < 80:
-            color = "\033[33m"  # yellow
-        else:
-            color = "\033[31m"  # red
+        limit = context_limit or 200_000
 
-        R = "\033[0m"  # reset
-        return f"{color}{pct:.0f}%{R}"
+        # Get LAST input tokens (each API call includes full message history)
+        last_input = 0
+        with open(transcript_path) as f:
+            for line in f:
+                try:
+                    entry = json.loads(line)
+                    usage = entry.get("message", {}).get("usage", {})
+                    if usage:
+                        inp = (usage.get("input_tokens", 0) +
+                               usage.get("cache_read_input_tokens", 0) +
+                               usage.get("cache_creation_input_tokens", 0))
+                        if inp > 0:
+                            last_input = inp
+                except:
+                    continue
+
+        if last_input == 0:
+            return {}
+
+        pct = (last_input / limit) * 100
+        tokens_left = limit - last_input
+        return {"pct": pct, "tokens_left": tokens_left}
     except:
-        return ""
+        return {}
+
+
+def format_bar(pct: float, width: int = 20) -> str:
+    """Build colored progress bar: [####--------------]"""
+    filled = round(pct / 100 * width)
+    filled = max(0, min(filled, width))
+
+    # Color by usage level (with ~15% overhead for system prompt/tools)
+    total_pct = pct + 15
+    if total_pct < 50:
+        color = "\033[32m"  # green
+    elif total_pct < 80:
+        color = "\033[33m"  # yellow
+    else:
+        color = "\033[31m"  # red
+
+    D = "\033[2m"   # dim
+    R = "\033[0m"   # reset
+    bar_filled = "#" * filled
+    bar_empty = "-" * (width - filled)
+    return f"{color}[{bar_filled}{D}{bar_empty}{R}{color}]{R}", color
 
 
 def main():
@@ -54,28 +88,43 @@ def main():
 
     project_dir = data.get("workspace", {}).get("project_dir", "")
     model = data.get("model", {}).get("display_name", "?")
+    transcript_path = data.get("transcript_path", "")
+    context_limit = data.get("context_window", {}).get("context_window_size", 200_000)
+    session_id = data.get("session_id", "")
     branch = get_branch(project_dir)
 
-    # Project folder name
-    folder = Path(project_dir).name if project_dir else "?"
+    # Context info
+    ctx = get_context_info(transcript_path, context_limit)
 
-    # Context usage (native API field)
-    ctx = get_context_usage(data)
+    # Project folder name
+    folder = Path(project_dir).name if project_dir else ""
 
     # ANSI colors
-    C = "\033[36m"  # cyan
-    M = "\033[35m"  # magenta
+    G = "\033[32m"  # green
     D = "\033[2m"   # dim
     R = "\033[0m"   # reset
+    SEP = f" {D}|{R} "
 
-    parts = [f"{D}{folder}{R}"]
+    Y = "\033[33m"  # yellow for model
+
+    parts = []
+    if folder:
+        parts.append(f"{D}{folder}{R}")
     if branch:
-        parts.append(f"{M}{branch}{R}")
-    parts.append(f"{C}{model}{R}")
-    if ctx:
-        parts.append(ctx)
+        parts.append(f"\033[35m{branch}{R}")
 
-    print(" >> ".join(parts))
+    if ctx:
+        bar, color = format_bar(ctx["pct"])
+        left_k = ctx["tokens_left"] / 1000
+        parts.append(bar)
+        parts.append(f"{color}~{left_k:.0f}k left{R}")
+
+    parts.append(f"{Y}[{model}]{R}")
+
+    if session_id:
+        parts.append(f"{D}{session_id}{R}")
+
+    print(SEP.join(parts))
 
 if __name__ == "__main__":
     main()
