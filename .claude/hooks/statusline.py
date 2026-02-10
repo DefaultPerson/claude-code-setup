@@ -103,9 +103,9 @@ def main():
     G = "\033[32m"  # green
     D = "\033[2m"   # dim
     R = "\033[0m"   # reset
-    SEP = f" {D}|{R} "
+    SEP = f" {D}>>{R} "
 
-    Y = "\033[33m"  # yellow for model
+    CL = "\033[38;2;217;119;87m"  # claude orange
 
     parts = []
     if folder:
@@ -113,16 +113,12 @@ def main():
     if branch:
         parts.append(f"\033[35m{branch}{R}")
 
+    parts.append(f"{CL}{model}{R}")
+
     if ctx:
         bar, color = format_bar(ctx["pct"])
         left_k = ctx["tokens_left"] / 1000
-        parts.append(bar)
-        parts.append(f"{color}~{left_k:.0f}k left{R}")
-
-    parts.append(f"{Y}[{model}]{R}")
-
-    if session_id:
-        parts.append(f"{D}{session_id}{R}")
+        parts.append(f"{bar} {color}~{left_k:.0f}k left{R}")
 
     print(SEP.join(parts))
 
