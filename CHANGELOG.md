@@ -4,9 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **`/commit`** — self-contained Conventional Commit command with inlined git rules
+- **`/push-and-pr`** — push and PR workflow with main-branch detection (skips PR on main)
+- **`/prime`** — general-purpose project context loader (structure, docs, stack, git activity)
+- **`/publish`** — interactive repo publication to GitHub (description, topics, license, gh-pages)
+- **`/release`** — create GitHub release with auto-generated changelog
+
 ### Changed
 
+- **`/commit`** — acts immediately without confirmation
+- **`/push-and-pr`** — acts immediately, asks to merge and delete branch after checks pass
+
 - **statusline.py** — new layout: `dir >> branch >> model >> [context bar] ~Xk left`, colored progress bar from transcript parsing, model in Claude orange, branch in magenta, removed session ID and percentage
+- **research.md** — removed year binding from confidence ratings, removed Russian keywords and examples
+- **README.md** — removed stale Pre-Compact Hook and chrome-devtools references, updated slash commands list, added `.env` optional note
+- **settings.example.json** — removed stale PreCompact hook and `enabledMcpjsonServers`
+- **settings.local.json.windows** — removed stale PreCompact hook and `enabledMcpjsonServers`
+- **CLAUDE.md** — replaced Russian example with English
+- **TTS scripts** — replaced Russian default test messages with English
+
+### Removed
+
+- **`/validation`** — removed validation command suite (example-validate, ultimate_validate_command)
 
 ## [0.5.0] - 2026-02-06
 

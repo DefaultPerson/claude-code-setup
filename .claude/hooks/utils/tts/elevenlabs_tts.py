@@ -131,7 +131,7 @@ def main():
     save_cache = "--cache" in args
     args = [a for a in args if a != "--cache"]
 
-    text = args[0] if args else "Система активирована. Добро пожаловать."
+    text = args[0] if args else "System activated. Welcome."
     voice = args[1] if len(args) > 1 else DEFAULT_VOICE
 
     speak(text, voice, save_cache)

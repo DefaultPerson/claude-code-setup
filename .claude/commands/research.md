@@ -18,8 +18,8 @@ You **MUST** consider the user input before proceeding.
    - If empty, ask user what to research
 
 2. **Auto-detect research mode** based on topic keywords:
-   - **Competitor Analysis**: "alternatives", "vs", "competitors", "pricing", "compare", product/company names, "аналоги", "конкуренты"
-   - **Technical Research**: "API", "how to", "best practices", "parsing", "library", "framework", "implementation", "github", "как", "парсить", "получить данные", "готовые решения"
+   - **Competitor Analysis**: "alternatives", "vs", "competitors", "pricing", "compare", product/company names
+   - **Technical Research**: "API", "how to", "best practices", "parsing", "library", "framework", "implementation", "github"
    - If unclear, proceed with general research approach
 
 3. **Generate output path**:
@@ -168,14 +168,14 @@ After each significant block of findings, write to the research document:
 - Key claims verified from multiple sources
 - Counter-arguments documented
 - New searches don't yield new information
-- User says "enough" / "хватит"
+- User says "enough"
 
 ### Phase 3: Synthesis & Documentation
 
 #### Confidence Ratings
 
 Use emoji indicators for claim confidence throughout the document:
-- 🟢 **High**: 3+ sources, official docs, recent data (2024-2025)
+- 🟢 **High**: 3+ sources, official docs, recent data
 - 🟡 **Medium**: 1-2 sources, reasonably recent
 - 🔴 **Low/Unverified**: Single source, outdated, or conflicting info
 
@@ -326,7 +326,6 @@ Structure findings based on detected mode:
 /research CoinGecko API alternatives
 /research NATS vs Kafka for real-time events
 /research telegram message parsing best practices
-/research как получить данные с binance
 /research python async web scraping
 /research github telegram bot python
 ```

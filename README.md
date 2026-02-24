@@ -21,9 +21,8 @@ My universal setup for [Claude Code](https://docs.anthropic.com/en/docs/claude-c
 - **TTS Notifications** — voice alerts when Claude finishes or needs input (ElevenLabs / OpenAI / pyttsx3)
 - **Desktop Notifications** — native OS notifications (Linux, macOS, Windows)
 - **Status Line** — shows project, branch, model, and context usage
-- **Pre-Compact Hook** — auto-saves session as HTML with markdown rendering and copy buttons
-- **Slash Commands** — `/research`, `/ultrathink`, `/validation`
-- **MCP Servers** — context7, chrome-devtools
+- **Slash Commands** — `/research`, `/ultrathink`, `/commit`, `/push-and-pr`, `/prime`, `/publish`, `/release`
+- **MCP Servers** — context7
 - **LSP Plugins** — TypeScript, Python (Pyright), Go (gopls) for better code understanding
 - **Cross-platform** — Linux, macOS, Windows
 
@@ -50,6 +49,9 @@ cp .claude/settings.example.json .claude/settings.json
 ```
 
 Edit files — replace paths and API keys (see `.env.example` and `.mcp.json.sample`).
+
+> [!NOTE]
+> `.env` is optional — without it, cached TTS phrases will be used. Safe to delete if you don't need dynamic TTS or custom API keys.
 
 Replace `/home/user/project` in `settings.json` with your path:
 

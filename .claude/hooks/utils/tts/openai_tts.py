@@ -92,7 +92,7 @@ def main():
     if len(sys.argv) > 1:
         text = " ".join(sys.argv[1:])
     else:
-        text = "Привет! Это тестовое сообщение."
+        text = "Hello! This is a test message."
 
     asyncio.run(speak(text))
 

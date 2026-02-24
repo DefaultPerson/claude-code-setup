@@ -1,12 +1,5 @@
 {
   "hooks": {
-    "PreCompact": [{
-      "matcher": "",
-      "hooks": [{
-        "type": "command",
-        "command": "uv run /home/user/project/.claude/hooks/pre_compact.py"
-      }]
-    }],
     "PreToolUse": [{
       "matcher": "Bash",
       "hooks": [{
@@ -35,7 +28,6 @@
     "ask": []
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [],
   "statusLine": {
     "type": "command",
     "command": "uv run /home/user/project/.claude/hooks/statusline.py",
