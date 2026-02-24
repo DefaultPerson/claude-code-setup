@@ -15,7 +15,9 @@ description: Push current branch and create a pull request.
 ## Algorithm
 
 1. **Guard**: `git status` — ensure working tree is clean (everything committed).
-   - **If on `main`**: stop — "You're on main. No PR needed. Push directly with `git push` or create a feature branch first." **STOP.**
+   - **If on `main`**: ask user (AskUserQuestion): "You're on main. Push directly or create a feature branch for PR?"
+     - **Push directly**: `git push origin main` → output "Pushed to main." **STOP.**
+     - **Create branch**: help create feature branch, switch to it, then continue.
    - **If on feature branch**: continue.
 2. **Sync**: `git fetch origin` → `git rebase origin/main` → `git push -u origin HEAD --force-with-lease`.
 3. **PR**:
