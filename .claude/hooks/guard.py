@@ -124,6 +124,16 @@ def is_dangerous_system_command(command: str) -> bool:
         # Network attacks
         (r'\bnc\s+-e\s+/bin/(ba)?sh', "reverse shell"),
         (r'\bbash\s+-i\s+>&\s+/dev/tcp/', "reverse shell"),
+
+        # Git — destructive remote operations
+        (r'\bgit\s+push\s+.*--force\b(?!-with-lease)', "git force push"),
+        (r'\bgit\s+push\s+.*-f\b', "git force push"),
+        (r'\bgit\s+reset\s+--hard', "git reset --hard"),
+        (r'\bgit\s+clean\s+.*-[a-z]*f', "git clean -f"),
+
+        # GitHub CLI — irreversible remote actions
+        (r'\bgh\s+repo\s+delete\b', "gh repo delete"),
+        (r'\bgh\s+release\s+delete\b', "gh release delete"),
     ]
 
     # === Windows dangerous patterns ===
@@ -322,11 +332,10 @@ def main():
         sys.exit(0)
 
     except json.JSONDecodeError:
-        sys.exit(0)
-    except Exception as e:
-        # On hook error - allow (fail-open)
-        # Change to sys.exit(2) for fail-close
-        sys.exit(0)
+        sys.exit(2)
+    except Exception:
+        # On hook error - block (fail-close)
+        sys.exit(2)
 
 
 if __name__ == '__main__':

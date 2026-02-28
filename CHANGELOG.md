@@ -4,7 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- **guard.py** — fail-open → fail-close: broken input or exceptions now block instead of allowing
+- **guard.py** — `.env` write protection for Edit/Write/MultiEdit was dead code (matcher only matched Bash)
+- **settings.json** — added `Edit|Write|MultiEdit` matcher to PreToolUse hooks
+
 ### Added
+
+- **guard.py** — git/gh destructive remote protection: `git push --force`, `git reset --hard`, `git clean -f`, `gh repo delete`, `gh release delete` (allows `--force-with-lease`)
 
 - **`/commit`** — self-contained Conventional Commit command with inlined git rules
 - **`/push-and-pr`** — push and PR workflow with main-branch detection (skips PR on main)
