@@ -13,29 +13,32 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - **guard.py** — git/gh destructive remote protection: `git push --force`, `git reset --hard`, `git clean -f`, `gh repo delete`, `gh release delete` (allows `--force-with-lease`)
-
 - **`/commit`** — self-contained Conventional Commit command with inlined git rules
 - **`/push-and-pr`** — push and PR workflow with main-branch detection (skips PR on main)
 - **`/prime`** — general-purpose project context loader (structure, docs, stack, git activity)
 - **`/publish`** — interactive repo publication to GitHub (description, topics, license, gh-pages)
 - **`/release`** — create GitHub release with auto-generated changelog
+- **`/sort-plan`** — sort and reorganize a plan file by headers with backup and verification
 
 ### Changed
 
 - **`/commit`** — acts immediately without confirmation
 - **`/push-and-pr`** — acts immediately, asks to merge and delete branch after checks pass
-
+- **notification.py** — simplified to cached-only mode: removed OpenAI/ElevenLabs/pyttsx3 dependencies, removed dynamic TTS generation, keeps cached MP3 playback and desktop notifications
+- **settings.example.json** — added `Edit|Write|MultiEdit` guard matcher, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`, `TTS_LANGUAGE`, `DESKTOP_NOTIFICATIONS` env vars; removed stale PreCompact hook and `enabledMcpjsonServers`
+- **settings.local.json.windows** — added `Edit|Write|MultiEdit` guard matcher, env vars; removed stale PreCompact hook and `enabledMcpjsonServers`
+- **`/publish`** — added owner/visibility for existing repos, Dependabot, CI workflow, description override questions
+- **README.md** — removed `.env` setup step (no longer needed)
+- **README.md** — updated TTS notifications description (cached-only); removed stale Pre-Compact Hook and chrome-devtools references, updated slash commands list, added `.env` optional note
 - **statusline.py** — new layout: `dir >> branch >> model >> [context bar] ~Xk left`, colored progress bar from transcript parsing, model in Claude orange, branch in magenta, removed session ID and percentage
 - **research.md** — removed year binding from confidence ratings, removed Russian keywords and examples
-- **README.md** — removed stale Pre-Compact Hook and chrome-devtools references, updated slash commands list, added `.env` optional note
-- **settings.example.json** — removed stale PreCompact hook and `enabledMcpjsonServers`
-- **settings.local.json.windows** — removed stale PreCompact hook and `enabledMcpjsonServers`
 - **CLAUDE.md** — replaced Russian example with English
-- **TTS scripts** — replaced Russian default test messages with English
 
 ### Removed
 
 - **`/validation`** — removed validation command suite (example-validate, ultimate_validate_command)
+- **utils/tts/** — removed ElevenLabs, OpenAI, and pyttsx3 TTS scripts (replaced by cached MP3 playback)
+- **.env.example** — removed (all env vars now in settings.json)
 
 ## [0.5.0] - 2026-02-06
 

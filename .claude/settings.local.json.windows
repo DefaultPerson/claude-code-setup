@@ -6,6 +6,12 @@
         "type": "command",
         "command": "uv run .claude\\hooks\\guard.py"
       }]
+    }, {
+      "matcher": "Edit|Write|MultiEdit",
+      "hooks": [{
+        "type": "command",
+        "command": "uv run .claude\\hooks\\guard.py"
+      }]
     }],
     "Stop": [{
       "matcher": "",
@@ -34,6 +40,9 @@
     "padding": 0
   },
   "env": {
-    "CONTEXT7_API_KEY": "paste_your_token"
+    "CONTEXT7_API_KEY": "paste_your_token",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "TTS_LANGUAGE": "en",
+    "DESKTOP_NOTIFICATIONS": "true"
   }
 }

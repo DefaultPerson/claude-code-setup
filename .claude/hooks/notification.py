@@ -1,15 +1,12 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.10"
-# dependencies = [
-#     "python-dotenv",
-#     "openai>=1.0.0",
-# ]
+# dependencies = []
 # ///
 """
 Claude Code Notification Hook
-Announces notifications when Claude is waiting for user input.
-Used as a Stop (post-response) hook.
+Plays cached MP3 alerts and sends desktop notifications when Claude needs attention.
+Used as a Stop (post-response) and Notification hook.
 """
 
 import json
@@ -21,17 +18,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from dotenv import load_dotenv
-
-# Load .env from project root
-PROJECT_ROOT = Path(__file__).parents[2]
-env_path = PROJECT_ROOT / ".env"
-if env_path.exists():
-    load_dotenv(env_path)
-
-HOOKS_DIR = Path(__file__).parent
-TTS_DIR = HOOKS_DIR / "utils" / "tts"
-CACHE_DIR = HOOKS_DIR / "cache"
+CACHE_DIR = Path(__file__).parent / "cache"
 
 # Messages — correspond to cache files in .claude/hooks/cache/
 MESSAGES = {
@@ -47,7 +34,7 @@ MESSAGES = {
     },
 }
 
-# Random completion phrases (en only) - full messages for caching
+# Random completion phrases (en only) — must match cached MP3 filenames
 COMPLETION_PHRASES_EN = [
     "Work complete! Awaiting your instructions.",
     "All done! Awaiting your instructions.",
@@ -76,17 +63,8 @@ NOTIFICATION_TITLES = {
 # =============================================================================
 
 
-def get_desktop_notifications_enabled() -> bool:
-    """Check if desktop notifications are enabled via DESKTOP_NOTIFICATIONS env var."""
-    return os.getenv("DESKTOP_NOTIFICATIONS", "true").lower() in ("true", "1", "yes")
-
-
 def send_desktop_notification(title: str, message: str) -> bool:
-    """
-    Send a desktop notification. Returns True if successful.
-    Uses native tools per platform (no external dependencies).
-    """
-    if not get_desktop_notifications_enabled():
+    if os.getenv("DESKTOP_NOTIFICATIONS", "true").lower() not in ("true", "1", "yes"):
         return False
 
     system = platform.system()
@@ -103,18 +81,15 @@ def send_desktop_notification(title: str, message: str) -> bool:
 
 
 def _notify_linux(title: str, message: str) -> bool:
-    """Linux: notify-send (libnotify) with replace to avoid stacking."""
     if not shutil.which("notify-send"):
         return False
     try:
-        # Use hint for notification replacement (works with most notification daemons)
-        # x-canonical-private-synchronous replaces notifications with same tag
         subprocess.run(
             [
                 "notify-send",
                 "-a", "Claude Code",
                 "-h", "string:x-canonical-private-synchronous:claude-code",
-                "-h", "string:x-dunst-stack-tag:claude-code",  # For Dunst users
+                "-h", "string:x-dunst-stack-tag:claude-code",
                 title,
                 message,
             ],
@@ -128,45 +103,33 @@ def _notify_linux(title: str, message: str) -> bool:
 
 
 def _notify_macos(title: str, message: str) -> bool:
-    """macOS: terminal-notifier (if available) or AppleScript fallback."""
-    # Try terminal-notifier first (supports click-to-activate and grouping)
     if shutil.which("terminal-notifier"):
         try:
-            # Get the frontmost app to activate on click
             result = subprocess.run(
                 ["osascript", "-e", 'tell application "System Events" to get name of first process whose frontmost is true'],
-                capture_output=True,
-                text=True,
-                timeout=2,
+                capture_output=True, text=True, timeout=2,
             )
             front_app = result.stdout.strip() if result.returncode == 0 else "Terminal"
-
             subprocess.run(
                 [
                     "terminal-notifier",
                     "-title", title,
                     "-message", message,
-                    "-group", "claude-code",  # Replaces previous notification
+                    "-group", "claude-code",
                     "-activate", f"com.apple.{front_app.lower().replace(' ', '')}",
                 ],
-                check=True,
-                capture_output=True,
-                timeout=5,
+                check=True, capture_output=True, timeout=5,
             )
             return True
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
             pass
 
-    # Fallback: AppleScript (no click action, no grouping)
     title_esc = title.replace("\\", "\\\\").replace('"', '\\"')
     message_esc = message.replace("\\", "\\\\").replace('"', '\\"')
-    script = f'display notification "{message_esc}" with title "{title_esc}"'
     try:
         subprocess.run(
-            ["osascript", "-e", script],
-            check=True,
-            capture_output=True,
-            timeout=5,
+            ["osascript", "-e", f'display notification "{message_esc}" with title "{title_esc}"'],
+            check=True, capture_output=True, timeout=5,
         )
         return True
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
@@ -174,13 +137,9 @@ def _notify_macos(title: str, message: str) -> bool:
 
 
 def _notify_windows(title: str, message: str) -> bool:
-    """Windows: PowerShell Toast (Win10+) with Balloon fallback (Win7-8)."""
-    # Escape for PowerShell single-quoted strings
     title_esc = title.replace("'", "''")
     message_esc = message.replace("'", "''")
 
-    # Try modern Toast notification first (Windows 10+)
-    # Tag and Group ensure notifications replace each other instead of stacking
     toast_script = f"""
 [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
 $template = [Windows.UI.Notifications.ToastTemplateType]::ToastText02
@@ -197,15 +156,13 @@ $notifier.Show($toast)
     try:
         result = subprocess.run(
             ["powershell", "-NoProfile", "-NonInteractive", "-Command", toast_script],
-            capture_output=True,
-            timeout=10,
+            capture_output=True, timeout=10,
         )
         if result.returncode == 0:
             return True
     except (subprocess.TimeoutExpired, FileNotFoundError):
         pass
 
-    # Fallback: Balloon notification (Windows 7/8 or if Toast fails)
     balloon_script = f"""
 Add-Type -AssemblyName System.Windows.Forms
 $notify = New-Object System.Windows.Forms.NotifyIcon
@@ -220,34 +177,24 @@ $notify.Dispose()
     try:
         subprocess.run(
             ["powershell", "-NoProfile", "-NonInteractive", "-Command", balloon_script],
-            check=True,
-            capture_output=True,
-            timeout=10,
+            check=True, capture_output=True, timeout=10,
         )
         return True
     except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError):
         return False
 
 
-def get_language() -> str:
-    """Returns language from TTS_LANGUAGE or 'ru' by default."""
-    lang = os.getenv("TTS_LANGUAGE", "en").lower()
-    return lang if lang in MESSAGES else "en"
+# =============================================================================
+# Audio Playback (cached MP3 only)
+# =============================================================================
 
 
-def get_mode() -> str:
-    """Returns mode: static (default) or dynamic."""
-    return os.getenv("TTS_MODE", "static").lower()
-
-
-def get_cache_path(text: str) -> Path:
-    """Path to cache file for text."""
+def play_cached(text: str) -> bool:
     safe_name = text.replace("/", "-").replace("\x00", "")
-    return CACHE_DIR / f"{safe_name}.mp3"
+    cache_path = CACHE_DIR / f"{safe_name}.mp3"
+    if not cache_path.exists():
+        return False
 
-
-def play_audio_file(filepath: Path) -> bool:
-    """Play mp3 directly. Returns True if successful."""
     players = [
         ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet"],
         ["mpv", "--no-video", "--really-quiet"],
@@ -255,124 +202,23 @@ def play_audio_file(filepath: Path) -> bool:
     for cmd in players:
         if shutil.which(cmd[0]):
             try:
-                subprocess.run(cmd + [str(filepath)], check=True, capture_output=True)
+                subprocess.run(cmd + [str(cache_path)], check=True, capture_output=True)
                 return True
             except subprocess.CalledProcessError:
                 continue
     return False
 
 
-def check_and_play_cache(text: str) -> bool:
-    """Check cache and play if exists. Returns True if played."""
-    cache_path = get_cache_path(text)
-    if cache_path.exists():
-        return play_audio_file(cache_path)
-    return False
+# =============================================================================
+# Main
+# =============================================================================
 
 
-def read_last_response(transcript_path: str) -> str | None:
-    """Reads the last text response from assistant in JSONL transcript."""
-    try:
-        path = Path(transcript_path)
-        if not path.exists():
-            return None
-        lines = path.read_text().strip().split("\n")
-        for line in reversed(lines[-50:]):
-            try:
-                entry = json.loads(line)
-                if entry.get("type") == "assistant":
-                    message = entry.get("message", {})
-                    content = message.get("content", [])
-                    text_parts = []
-                    for item in content:
-                        if isinstance(item, dict) and item.get("type") == "text":
-                            text_parts.append(item.get("text", ""))
-                        elif isinstance(item, str):
-                            text_parts.append(item)
-                    if text_parts:
-                        return "\n".join(text_parts)
-            except json.JSONDecodeError:
-                continue
-        return None
-    except Exception:
-        return None
-
-
-def generate_summary(last_response: str, language: str) -> str | None:
-    """Generates a brief voice summary based on Claude's last response."""
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key or not last_response:
-        return None
-    try:
-        from openai import OpenAI
-        client = OpenAI(api_key=api_key, timeout=10.0)
-        truncated = last_response[:2000] if len(last_response) > 2000 else last_response
-        if language == "ru":
-            prompt = (
-                "Сделай очень краткую озвучку (2 коротких предложения) что было сделано. "
-                "Начни с 'Задача выполнена.' Упоминай конкретику (файлы, модули) без расширений. "
-                "Никаких приветствий и лишних слов.\n\n"
-                f"Ответ ассистента:\n{truncated}"
-            )
-        else:
-            prompt = (
-                "Create a very brief voice summary (2 short sentences) of what was done. "
-                "Start with 'Task completed.' Mention specifics (files, modules) without extensions. "
-                "No greetings or filler words.\n\n"
-                f"Assistant response:\n{truncated}"
-            )
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            max_tokens=150,
-        )
-        content = response.choices[0].message.content
-        return content.strip() if content else None
-    except Exception:
-        return None
-
-
-def get_tts_script_path() -> Path | None:
-    """Selects TTS script by priority: ElevenLabs > OpenAI > pyttsx3."""
-    if os.getenv("ELEVENLABS_API_KEY"):
-        elevenlabs_script = TTS_DIR / "elevenlabs_tts.py"
-        if elevenlabs_script.exists():
-            return elevenlabs_script
-    if os.getenv("OPENAI_API_KEY"):
-        openai_script = TTS_DIR / "openai_tts.py"
-        if openai_script.exists():
-            return openai_script
-    pyttsx3_script = TTS_DIR / "pyttsx3_tts.py"
-    if pyttsx3_script.exists():
-        return pyttsx3_script
-    return None
-
-
-def announce_notification(
-    message: str,
-    is_static: bool = True,
-    notification_type: str = "ready",
-    lang: str = "en",
-) -> None:
-    """Announces a message via TTS and desktop notification."""
-    # Send desktop notification
+def announce(message: str, notification_type: str, lang: str) -> None:
     titles = NOTIFICATION_TITLES.get(lang, NOTIFICATION_TITLES["en"])
     title = titles.get(notification_type, titles["ready"])
     send_desktop_notification(title, message)
-
-    # Play TTS
-    if is_static and check_and_play_cache(message):
-        return
-    tts_script = get_tts_script_path()
-    if not tts_script:
-        return
-    cmd = ["uv", "run", str(tts_script), message]
-    if is_static:
-        cmd.append("--cache")
-    try:
-        subprocess.run(cmd, timeout=15, capture_output=True, cwd=HOOKS_DIR)
-    except (subprocess.TimeoutExpired, Exception):
-        pass
+    play_cached(message)
 
 
 def main():
@@ -384,38 +230,26 @@ def main():
     except json.JSONDecodeError:
         input_data = {}
 
-    lang = get_language()
-    mode = get_mode()
+    lang = os.getenv("TTS_LANGUAGE", "en").lower()
+    if lang not in MESSAGES:
+        lang = "en"
     msgs = MESSAGES[lang]
 
     if permission:
         notif_type = input_data.get("notification_type", "")
         if notif_type == "idle_prompt":
-            announce_notification(msgs["idle"], is_static=True, notification_type="idle", lang=lang)
-            sys.exit(0)
-        announce_notification(msgs["permission"], is_static=True, notification_type="permission", lang=lang)
+            announce(msgs["idle"], "idle", lang)
+        else:
+            announce(msgs["permission"], "permission", lang)
         sys.exit(0)
 
     if notify:
-        hook_event = input_data.get("hook_event_name", "")
-        if hook_event == "Stop":
-            if mode == "dynamic":
-                transcript_path = input_data.get("transcript_path")
-                message = None
-                if transcript_path:
-                    last_response = read_last_response(transcript_path)
-                    if last_response:
-                        message = generate_summary(last_response, lang)
-                if message:
-                    announce_notification(message, is_static=False, notification_type="ready", lang=lang)
-                else:
-                    announce_notification(msgs["ready"], is_static=True, notification_type="ready", lang=lang)
+        if input_data.get("hook_event_name") == "Stop":
+            if lang == "en":
+                message = random.choice(COMPLETION_PHRASES_EN)
             else:
-                if lang == "en":
-                    message = random.choice(COMPLETION_PHRASES_EN)
-                    announce_notification(message, is_static=True, notification_type="ready", lang=lang)
-                else:
-                    announce_notification(msgs["ready"], is_static=True, notification_type="ready", lang=lang)
+                message = msgs["ready"]
+            announce(message, "ready", lang)
 
     sys.exit(0)
 

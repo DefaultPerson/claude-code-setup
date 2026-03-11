@@ -18,10 +18,10 @@ My universal setup for [Claude Code](https://docs.anthropic.com/en/docs/claude-c
 ## 🚀 Features
 
 - **Security Guard** — blocks dangerous commands (`rm -rf /`, `.env` writes, privileged docker, etc.)
-- **TTS Notifications** — voice alerts when Claude finishes or needs input (ElevenLabs / OpenAI / pyttsx3)
+- **TTS Notifications** — cached voice alerts when Claude finishes or needs input
 - **Desktop Notifications** — native OS notifications (Linux, macOS, Windows)
 - **Status Line** — shows project, branch, model, and context usage
-- **Slash Commands** — `/research`, `/ultrathink`, `/commit`, `/push-and-pr`, `/prime`, `/publish`, `/release`
+- **Slash Commands** — `/research`, `/ultrathink`, `/commit`, `/push-and-pr`, `/prime`, `/publish`, `/release`, `/sort-plan`
 - **MCP Servers** — context7
 - **LSP Plugins** — TypeScript, Python (Pyright), Go (gopls) for better code understanding
 - **Cross-platform** — Linux, macOS, Windows
@@ -43,15 +43,11 @@ My universal setup for [Claude Code](https://docs.anthropic.com/en/docs/claude-c
 git clone https://github.com/user/claude-code-setup.git
 cd claude-code-setup
 
-cp .env.example .env
 cp .mcp.json.sample .mcp.json              # Windows: .mcp.json.windows
 cp .claude/settings.example.json .claude/settings.json
 ```
 
-Edit files — replace paths and API keys (see `.env.example` and `.mcp.json.sample`).
-
-> [!NOTE]
-> `.env` is optional — without it, cached TTS phrases will be used. Safe to delete if you don't need dynamic TTS or custom API keys.
+Edit files — replace paths and API keys (see `.mcp.json.sample`).
 
 Replace `/home/user/project` in `settings.json` with your path:
 
