@@ -12,7 +12,7 @@ Arguments: <file path>
 
 2. **Backup**: `cp <file> <file>.bak`
 
-3. **Sort**: Read the file, group content under its nearest header, sort sections alphabetically by header. Preserve every original line exactly as-is — no rewording, no reformatting. Keep frontmatter at the top.
+3. **Sort**: Read the file, group content under its nearest header, sort sections alphabetically by header. Every line must end up under some header — if orphan lines exist above the first header, create one for them. Preserve every original line exactly as-is — no rewording, no reformatting. Keep frontmatter at the top.
 
 4. **Write sorted version** to original path.
 
