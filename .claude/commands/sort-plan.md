@@ -12,7 +12,13 @@ Arguments: <file path>
 
 2. **Backup**: `cp <file> <file>.bak`
 
-3. **Sort**: Read the file, group content under its nearest header, sort sections alphabetically by header. Every line must end up under some header — if orphan lines exist above the first header, create one for them. Preserve every original line exactly as-is — no rewording, no reformatting. Keep frontmatter at the top.
+3. **Sort** (semantic, not mechanical):
+   a. Parse file into sections (## headers). If orphan lines exist above the first header — create a header for them.
+   b. **Semantic audit**: Go through EVERY non-empty line in EVERY section. For each line, check: does this line's topic match its current section header? If not — move it to the correct section. Common misplacements: tasks dumped under a catch-all section, items that match another section's topic by keyword, repo/docs cleanup mixed with infra tasks.
+   c. Sort sections alphabetically by header.
+   d. Insert moved lines before the first ### subsection in the target (not at the very end). Respect code block boundaries (``` ... ```) when detecting subsections.
+   e. Collapse consecutive blank lines (max 1).
+   f. Preserve every original line exactly as-is — no rewording, no reformatting. Keep frontmatter at the top.
 
 4. **Write sorted version** to original path.
 
