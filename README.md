@@ -21,7 +21,7 @@ My universal setup for [Claude Code](https://docs.anthropic.com/en/docs/claude-c
 - **TTS Notifications** — cached voice alerts when Claude finishes or needs input
 - **Desktop Notifications** — native OS notifications (Linux, macOS, Windows)
 - **Status Line** — shows project, branch, model, and context usage
-- **Slash Commands** — `/research`, `/ultrathink`, `/commit`, `/push-and-pr`, `/prime`, `/publish`, `/release`, `/sort-plan`
+- **Slash Commands** — `/research`, `/ultrathink`, `/commit`, `/push-and-pr`, `/prime`, `/publish`, `/release`
 - **MCP Servers** — context7
 - **LSP Plugins** — TypeScript, Python (Pyright), Go (gopls) for better code understanding
 - **Cross-platform** — Linux, macOS, Windows

@@ -20,7 +20,6 @@ All notable changes to this project will be documented in this file.
 - **`/prime`** — general-purpose project context loader (structure, docs, stack, git activity)
 - **`/publish`** — interactive repo publication to GitHub (description, topics, license, gh-pages)
 - **`/release`** — create GitHub release with auto-generated changelog
-- **`/sort-plan`** — sort and reorganize a plan file by headers with backup and verification
 
 ### Changed
 
