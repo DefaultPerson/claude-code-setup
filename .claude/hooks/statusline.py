@@ -18,7 +18,7 @@ def get_branch(project_dir: str) -> str:
         return ""
 
 
-def format_bar(pct: float, width: int = 20) -> str:
+def format_bar(pct: float, width: int = 10) -> str:
     """Build colored progress bar: [####--------------]"""
     filled = round(pct / 100 * width)
     filled = max(0, min(filled, width))
