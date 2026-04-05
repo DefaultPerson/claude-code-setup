@@ -33,7 +33,7 @@ Prerequisites: Node.js 18+, uv (python package manager), ffmpeg or mpv (audio fo
 
 ## Recommended Plugins
 
-LSP and context7 are available in the default marketplace — install via `/plugin` → search.
+LSP, context7, frontend-design are available in the default marketplace — install via `/plugin` → search.
 
 ```bash
 # Context optimization — keeps raw tool output out of context window
