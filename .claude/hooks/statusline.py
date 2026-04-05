@@ -97,8 +97,8 @@ def main():
             rl_color = "\033[33m"
         else:
             rl_color = "\033[31m"
-        rl_text = f"{rl5:.0f}/{rl7:.0f}%" if rl7 is not None else f"{rl5:.0f}%"
-        parts.append(f"{rl_color}[{rl_text}]{R}")
+        rl_text = f"{rl5:.0f}%/{rl7:.0f}%" if rl7 is not None else f"{rl5:.0f}%"
+        parts.append(f"{rl_color}{rl_text}{R}")
 
     # Context bar
     if pct is not None:
