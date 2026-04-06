@@ -12,6 +12,12 @@
         "type": "command",
         "command": "uv run \"%USERPROFILE%\\.claude\\hooks\\guard.py\""
       }]
+    }, {
+      "matcher": "Read",
+      "hooks": [{
+        "type": "command",
+        "command": "uv run \"%USERPROFILE%\\.claude\\hooks\\guard.py\""
+      }]
     }],
     "Stop": [{
       "matcher": "",

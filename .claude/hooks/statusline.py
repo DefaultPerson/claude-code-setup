@@ -14,7 +14,7 @@ def get_branch(project_dir: str) -> str:
             capture_output=True, text=True, timeout=1
         )
         return result.stdout.strip() if result.returncode == 0 else ""
-    except:
+    except Exception:
         return ""
 
 
@@ -43,7 +43,7 @@ def main():
     try:
         raw = sys.stdin.read()
         data = json.loads(raw)
-    except:
+    except Exception:
         print("⚠ parse error")
         return
 
@@ -84,6 +84,7 @@ def main():
     if branch:
         parts.append(f"\033[35m{branch}{R}")
 
+    model = model.split(" (")[0]  # "Opus 4.6 (1M context)" → "Opus 4.6"
     parts.append(f"{CL}{model}{R}")
 
     # Rate limits — compact [5h/7d%]

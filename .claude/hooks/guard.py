@@ -6,6 +6,7 @@ Cross-platform: supports both Unix and Windows.
 """
 
 import json
+import os
 import sys
 import re
 import platform
@@ -15,7 +16,7 @@ from datetime import datetime
 IS_WINDOWS = platform.system() == "Windows"
 
 
-def is_dangerous_delete_command(command: str) -> bool:
+def is_dangerous_delete_command(command: str) -> tuple[bool, str | None]:
     """
     Detection of dangerous delete commands.
     Cross-platform: Unix (rm) and Windows (del, rd, rmdir, Remove-Item).
@@ -75,19 +76,19 @@ def is_dangerous_delete_command(command: str) -> bool:
         if re.search(pattern, normalized):
             for path in unix_dangerous_paths:
                 if re.search(path, normalized):
-                    return True
+                    return True, "Dangerous delete: recursive force on system path"
 
     # Check Windows
     for pattern in windows_del_patterns:
         if re.search(pattern, normalized):
             for path in windows_dangerous_paths:
                 if re.search(path, normalized):
-                    return True
+                    return True, "Dangerous delete: recursive force on system path (Windows)"
 
-    return False
+    return False, None
 
 
-def is_dangerous_system_command(command: str) -> bool:
+def is_dangerous_system_command(command: str) -> tuple[bool, str | None]:
     """
     Detection of dangerous system commands.
     Cross-platform: Unix and Windows/PowerShell.
@@ -275,8 +276,12 @@ def main():
         tool_name = input_data.get('tool_name', '')
         tool_input = input_data.get('tool_input', {})
 
-        # Define log directory
-        log_dir = Path.home() / '.claude' / 'logs'
+        # Define log directory (platform-agnostic: Codex or Claude Code)
+        codex_home = os.environ.get('CODEX_HOME')
+        if codex_home:
+            log_dir = Path(codex_home) / 'logs'
+        else:
+            log_dir = Path.home() / '.claude' / 'logs'
         log_dir.mkdir(parents=True, exist_ok=True)
 
         # === Check credential file reads ===
@@ -291,8 +296,9 @@ def main():
             command = tool_input.get('command', '')
 
             # Check dangerous delete commands (rm/del/rd)
-            if is_dangerous_delete_command(command):
-                reason = "Dangerous delete command detected"
+            is_del, del_reason = is_dangerous_delete_command(command)
+            if is_del:
+                reason = del_reason or "Dangerous delete command detected"
                 log_action(log_dir, input_data, blocked=True, reason=reason)
                 print(f"BLOCKED: {reason}", file=sys.stderr)
                 sys.exit(2)
