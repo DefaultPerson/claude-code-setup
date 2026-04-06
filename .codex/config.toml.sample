@@ -1,0 +1,31 @@
+# Codex CLI configuration
+# Equivalent of .claude/settings.example.json
+# Copy to ~/.codex/config.toml and edit paths/keys
+
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+approval_policy = "on-request"
+notify = ["python3", "~/.codex/hooks/notification.py"]
+
+[features]
+multi_agent = true
+codex_hooks = true
+apps = false
+plugins = false
+tool_suggest = false
+
+[tui]
+status_line = ["current-dir", "git-branch", "model-with-reasoning", "context-remaining"]
+
+[shell_environment_policy]
+inherit = "core"
+
+[shell_environment_policy.set]
+TTS_LANGUAGE = "en"
+DESKTOP_NOTIFICATIONS = "true"
+
+# MCP Servers
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+headers = { CONTEXT7_API_KEY = "$CONTEXT7_API_KEY" }
