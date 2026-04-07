@@ -64,6 +64,20 @@ You **MUST** consider the user input before proceeding.
 
 Only ask clarifying questions if topic is genuinely ambiguous. **Max 3 questions.**
 
+Present questions one at a time with recommendation:
+
+**Recommended:** Option X - {reasoning}
+
+| Option | Description |
+|--------|-------------|
+| A | ... |
+| B | ... |
+
+Possible questions (only if truly unclear):
+1. **Scope**: Which aspects are most important? (features, pricing, implementation, all)
+2. **Depth**: Quick overview or deep dive?
+3. **Targets**: Any specific products/libraries to include or exclude?
+
 Skip clarification if topic is clear enough to proceed.
 
 ### Phase 2: Deep Research Execution
@@ -125,15 +139,120 @@ After each significant block of findings, write to the research document.
 - 🟡 **Medium**: 1-2 sources, reasonably recent
 - 🔴 **Low/Unverified**: Single source, outdated, or conflicting info
 
-Structure findings based on detected mode (competitor analysis or technical research).
+Structure findings based on detected mode:
+
+#### For Competitor Analysis
+
+```markdown
+## Executive Summary
+{2-3 paragraphs: key findings, market landscape, recommendation}
+
+## Market Overview
+{Brief description of the market/category}
+
+## Competitors
+
+### {Competitor 1}
+- **Overview**: {what it is, who it's for}
+- **Key Features**: {bullet list}
+- **Pricing**: {tiers, free tier, enterprise options}
+- **Strengths**: {what they do well}
+- **Weaknesses**: {gaps, issues, limitations}
+- **User Sentiment**: {reviews summary if found}
+
+### {Competitor 2}
+...
+
+## Feature Comparison
+
+| Feature | {Comp 1} | {Comp 2} | {Comp 3} |
+|---------|----------|----------|----------|
+| ... | ... | ... | ... |
+
+## Pricing Comparison
+
+| Tier | {Comp 1} | {Comp 2} | {Comp 3} |
+|------|----------|----------|----------|
+| Free | ... | ... | ... |
+| Pro | ... | ... | ... |
+
+## Recommendations
+- **Primary**: {what to choose and why}
+- **Alternatives**: {when to consider others}
+- **Open Questions**: {what needs further investigation}
+```
+
+#### For Technical Research
+
+```markdown
+## Executive Summary
+{2-3 paragraphs: problem, solution approach, recommendation}
+
+## Technology Overview
+{What the technology/approach is about}
+
+## Best Practices
+- **{Practice 1}**: {description + rationale}
+- **{Practice 2}**: {description + rationale}
+
+## Implementation Patterns
+
+### Pattern: {Name}
+{code example if applicable}
+**When to use**: {context}
+**Trade-offs**: {pros/cons}
+
+## Alternatives Comparison
+
+| Criterion | {Option 1} | {Option 2} | {Option 3} |
+|-----------|------------|------------|------------|
+| Performance | ... | ... | ... |
+| Complexity | ... | ... | ... |
+| Community | ... | ... | ... |
+
+## Security Considerations
+- {Security concern 1}
+- {Security concern 2}
+
+## Recommendations
+- **Primary**: {recommended approach}
+- **Alternatives**: {when to consider others}
+- **Open Questions**: {what needs team decision}
+```
 
 ### Phase 4: Finalize & Report
 
 1. Update document status to "Final"
-2. Add **Disputed/Unverified Claims** section (if any)
-3. Add **Research Metadata** (sources consulted, passes, depth)
-4. Compile **Sources** section with annotations
-5. Report to user: path, summary, disputed claims, next steps
+
+2. Add **Disputed/Unverified Claims** section (if any):
+   ```markdown
+   ## Disputed/Unverified Claims
+   - {Claim 1}: {why uncertain — conflicting sources, single mention, etc.}
+   - {Claim 2}: {needs verification — only found in one place}
+   ```
+
+3. Add **Research Metadata**:
+   ```markdown
+   ## Research Metadata
+   - **Sources consulted**: {N}
+   - **Search passes**: {N}
+   - **Subtopics covered**: {list}
+   - **Parallel agents used**: Yes/No
+   - **Research depth**: Deep / Standard
+   ```
+
+4. Compile **Sources** section with annotations:
+   ```markdown
+   ## Sources
+   1. [{Title}]({URL}) - {brief annotation: why valuable}
+   2. ...
+   ```
+
+5. Report to user:
+   - Path to research document
+   - Brief summary of key findings (3-5 bullet points)
+   - Highlight any disputed/unverified claims
+   - Suggested next steps if applicable
 
 ## Rules
 
@@ -142,3 +261,20 @@ Structure findings based on detected mode (competitor analysis or technical rese
 - **No artificial search limits** — research until topic is covered
 - **Sources at end**, not inline
 - Match **user's language** in output
+
+## Error Handling
+
+- If no relevant results: note the gap, suggest query refinement
+- If conflicting information: document both perspectives, recommend verification approach
+- If search fails: retry once, then document limitation
+
+## Examples
+
+```
+/research telegram aggregator alternatives
+/research CoinGecko API alternatives
+/research NATS vs Kafka for real-time events
+/research telegram message parsing best practices
+/research python async web scraping
+/research github telegram bot python
+```
