@@ -265,8 +265,11 @@ def log_action(log_dir: Path, input_data: dict, blocked: bool = False, reason: s
     if len(log_data) > 1000:
         log_data = log_data[-1000:]
 
-    with open(log_path, 'w') as f:
-        json.dump(log_data, f, indent=2, ensure_ascii=False)
+    try:
+        with open(log_path, 'w') as f:
+            json.dump(log_data, f, indent=2, ensure_ascii=False)
+    except OSError:
+        return
 
 
 def main():
