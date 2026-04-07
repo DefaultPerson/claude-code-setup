@@ -40,11 +40,6 @@ Prerequisites: Node.js 18+, uv (python package manager), ffmpeg or mpv (audio fo
 LSP, context7, frontend-design are available in the default marketplace — install via `/plugin` → search.
 
 ```bash
-# Context optimization — keeps raw tool output out of context window
-# https://github.com/mksglu/context-mode
-/plugin marketplace add mksglu/context-mode
-/plugin install context-mode@context-mode
-
 # Browser automation for AI agents
 # https://github.com/vercel-labs/agent-browser
 /plugin marketplace add vercel-labs/agent-browser
@@ -66,6 +61,8 @@ alias cc="claude" ccr="claude --resume" ccd="claude --dangerously-skip-permissio
 ## Codex CLI
 
 ### Setup
+
+Paste into Codex — or follow the steps manually:
 
 ```
 Prerequisites: Node.js 18+, uv (python package manager), ffmpeg or mpv (audio for TTS).
@@ -91,7 +88,6 @@ Prerequisites: Node.js 18+, uv (python package manager), ffmpeg or mpv (audio fo
 
 ### Recommended Plugins
 
-- [context-mode](https://github.com/mksglu/context-mode) — context window optimization
 - [agent-browser](https://github.com/vercel-labs/agent-browser) — browser automation for AI agents
 - [context7](https://github.com/upstash/context7) — library documentation lookup
 - [frontend-design](https://github.com/anthropics/claude-plugins-official/tree/main/plugins/frontend-design) — production-grade frontend generation
@@ -101,7 +97,7 @@ Prerequisites: Node.js 18+, uv (python package manager), ffmpeg or mpv (audio fo
 Add to `.bashrc` / `.zshrc`:
 
 ```bash
-alias cx="codex" cxr="codex resume --last" cxd="codex --full-auto"
+alias cx="codex" cxr="codex resume" cxd="codex --full-auto" cxdr="codex resume --full-auto"
 ```
 
 ---
