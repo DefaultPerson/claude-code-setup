@@ -80,6 +80,14 @@ sed -i '/FIREWORKS_API_KEY/d' ~/.bashrc ~/.zshrc 2>/dev/null || true
 ```
 
 Windows (PowerShell):
+
+> [!WARNING]
+> **Destructive — read before pasting.** `Remove-Item -Recurse -Force` permanently deletes the target directory with no prompt and no Recycle Bin. Double-check the path is exactly `...\.config\opencode` before running — a typo like `...\.config` (without `\opencode`) wipes every dotfile config under `.config`. Dry-run first with `-WhatIf`:
+>
+> ```powershell
+> Remove-Item -Recurse -Force "$env:USERPROFILE\.config\opencode" -WhatIf
+> ```
+
 ```powershell
 Remove-Item -Recurse -Force "$env:USERPROFILE\.config\opencode"
 [Environment]::SetEnvironmentVariable('FIREWORKS_API_KEY', $null, 'User')
