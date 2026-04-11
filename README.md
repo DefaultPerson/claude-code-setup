@@ -15,10 +15,24 @@ Universal setup for [Claude Code](https://docs.anthropic.com/en/docs/claude-code
 
 ## OpenCode (Fireworks + GLM-5.1)
 
-Fastest path — one command, one API key, done:
+Fastest path — one command, one API key, done.
+
+**Linux / macOS / WSL (bash):**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/DefaultPerson/agent-setup/feat/opencode-support/scripts/install-opencode.sh | bash
+```
+
+**Windows (PowerShell 5.1+):**
+
+```powershell
+irm https://raw.githubusercontent.com/DefaultPerson/agent-setup/feat/opencode-support/scripts/install-opencode.ps1 | iex
+```
+
+If the execution policy blocks it:
+
+```powershell
+powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/DefaultPerson/agent-setup/feat/opencode-support/scripts/install-opencode.ps1 | iex"
 ```
 
 (flip the branch segment to `master` after the PR is merged)
@@ -33,7 +47,9 @@ curl -fsSL https://raw.githubusercontent.com/DefaultPerson/agent-setup/feat/open
 6. Prompts once for your `FIREWORKS_API_KEY` ([get one here](https://fireworks.ai/account/api-keys)) and persists it to your shell rc file
 7. Runs a smoke test against Fireworks to confirm auth + model availability
 
-**Prerequisites:** `curl`, `bash`, `python3`. No `jq` needed. Linux or macOS (Windows: use WSL).
+**Prerequisites:**
+- Linux / macOS / WSL: `curl`, `bash`, `python3`. No `jq`.
+- Windows: PowerShell 5.1 (built-in on Windows 10/11) + one of `winget` (pre-installed on Windows 10 1809+/11), `scoop`, or `npm`. No Python or bash required — the PS installer is self-contained and uses `Invoke-RestMethod` for all network/JSON work. Config lands in `%USERPROFILE%\.config\opencode\`, and `FIREWORKS_API_KEY` is persisted to the User environment via `[Environment]::SetEnvironmentVariable(..., 'User')`.
 
 **Then:**
 
@@ -57,9 +73,17 @@ alias oc="opencode" ocr="opencode --continue"
 
 **Rollback / uninstall:**
 
+Linux / macOS:
 ```bash
 rm -rf ~/.config/opencode ~/.opencode
 sed -i '/FIREWORKS_API_KEY/d' ~/.bashrc ~/.zshrc 2>/dev/null || true
+```
+
+Windows (PowerShell):
+```powershell
+Remove-Item -Recurse -Force "$env:USERPROFILE\.config\opencode"
+[Environment]::SetEnvironmentVariable('FIREWORKS_API_KEY', $null, 'User')
+winget uninstall --exact --id SST.opencode    # optional: removes the CLI
 ```
 
 ---

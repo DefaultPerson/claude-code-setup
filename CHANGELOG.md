@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - **OpenCode support** — new `.opencode/opencode.json` template and `scripts/install-opencode.sh` one-liner installer. Provisions OpenCode with Fireworks as the provider, GLM-5.1 as the default model (slug resolved at install time from Fireworks' live `/v1/models` catalog), DeepSeek V3.2 as `small_model`, `context7` MCP, and the existing Claude Code slash commands (reused verbatim — format is byte-compatible).
-- **README.md** — new `## OpenCode (Fireworks + GLM-5.1)` section with `curl | bash` installer, prerequisites, limitations, and rollback instructions; tagline extended to list OpenCode alongside Claude Code and Codex CLI.
+- **Windows installer** — native `scripts/install-opencode.ps1` PowerShell port (PS 5.1+). Uses winget (fallback scoop, npm) to install the OpenCode CLI, writes to `%USERPROFILE%\.config\opencode\`, persists `FIREWORKS_API_KEY` via `[Environment]::SetEnvironmentVariable(..., 'User')`, resolves the GLM slug via `Invoke-RestMethod` (no Python or jq needed), validates JSON and smoke-tests `/chat/completions`. Works via `irm ... | iex`. Pure ASCII, TLS 1.2 enforced, PSScriptAnalyzer-clean.
+- **README.md** — new `## OpenCode (Fireworks + GLM-5.1)` section with bash and PowerShell one-liners, per-OS prerequisites, limitations, and rollback instructions (including Windows cleanup via `[Environment]::SetEnvironmentVariable(..., $null, 'User')`); tagline extended to list OpenCode alongside Claude Code and Codex CLI.
 
 ### Notes
 
