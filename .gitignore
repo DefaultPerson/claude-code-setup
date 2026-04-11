@@ -1,6 +1,7 @@
 logs/
 *.log
 *.log.*
+.codex/log/
 
 # Pre-compact backups
 .claude/backups/
