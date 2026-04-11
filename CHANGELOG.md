@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## 2026-04-12
+
+### Added
+
+- **OpenCode support** — new `.opencode/opencode.json` template and `scripts/install-opencode.sh` one-liner installer. Provisions OpenCode with Fireworks as the provider, GLM-5.1 as the default model (slug resolved at install time from Fireworks' live `/v1/models` catalog), DeepSeek V3.2 as `small_model`, `context7` MCP, and the existing Claude Code slash commands (reused verbatim — format is byte-compatible).
+- **README.md** — new `## OpenCode (Fireworks + GLM-5.1)` section with `curl | bash` installer, prerequisites, limitations, and rollback instructions; tagline extended to list OpenCode alongside Claude Code and Codex CLI.
+
+### Notes
+
+- OpenCode does not support event hooks (PreToolUse/Stop/Notification), so `guard.py`, `notification.py`, `statusline.py` are **not** ported; `permission.bash: "ask"` is the minimum-viable safeguard.
+- Slash commands live only in `.claude/commands/` — the installer sources them from there directly. If OpenCode's format diverges in the future, add an override dir at `.opencode/commands/`.
+
 ## 2026-04-06
 
 ### Changed
