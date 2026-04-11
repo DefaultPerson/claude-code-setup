@@ -1,0 +1,51 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "fireworks": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Fireworks",
+      "options": {
+        "baseURL": "https://api.fireworks.ai/inference/v1",
+        "apiKey": "{env:FIREWORKS_API_KEY}"
+      },
+      "models": {
+        "{{GLM_MODEL_ID}}": {
+          "name": "GLM-5.1",
+          "limit": {
+            "context": 200000,
+            "output": 32768
+          },
+          "tool_call": true,
+          "reasoning": true
+        },
+        "accounts/fireworks/models/deepseek-v3p2": {
+          "name": "DeepSeek V3.2",
+          "limit": {
+            "context": 128000,
+            "output": 8192
+          },
+          "tool_call": true
+        }
+      }
+    }
+  },
+  "model": "fireworks/{{GLM_MODEL_ID}}",
+  "small_model": "fireworks/accounts/fireworks/models/deepseek-v3p2",
+  "permission": {
+    "edit": "allow",
+    "bash": "ask",
+    "webfetch": "allow"
+  },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "enabled": true,
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      }
+    }
+  },
+  "instructions": ["~/.config/opencode/AGENTS.md"],
+  "autoupdate": true
+}
