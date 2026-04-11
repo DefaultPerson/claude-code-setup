@@ -1,6 +1,6 @@
 # agent-setup
 
-Universal setup for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) and [OpenAI Codex CLI](https://developers.openai.com/codex/cli) — security hooks, notifications, status line, and productivity commands.
+Universal setup for [Claude Code](https://docs.anthropic.com/en/docs/claude-code), [OpenAI Codex CLI](https://developers.openai.com/codex/cli), and [OpenCode](https://opencode.ai) — security hooks, notifications, status line, and productivity commands.
 
 ## Features
 
@@ -10,6 +10,57 @@ Universal setup for [Claude Code](https://docs.anthropic.com/en/docs/claude-code
 - **Status Line** — project, branch, model, context usage, rate limits
 - **Slash Commands** — `/research`, `/ultrathink`, `/commit`, `/push-and-pr`, `/prime`, `/publish`, `/release`
 - **Cross-platform** — Linux, macOS, Windows
+
+---
+
+## OpenCode (Fireworks + GLM-5.1)
+
+Fastest path — one command, one API key, done:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/DefaultPerson/agent-setup/feat/opencode-support/scripts/install-opencode.sh | bash
+```
+
+(flip the branch segment to `master` after the PR is merged)
+
+**What it does:**
+
+1. Installs the `opencode` CLI if missing (via `opencode.ai/install`)
+2. Writes `~/.config/opencode/opencode.json` with Fireworks as the provider, **GLM-5.1** as the default model (slug auto-resolved from Fireworks' live `/v1/models` catalog), **DeepSeek V3.2** as the small/background model
+3. Copies 7 slash commands (`/commit`, `/push-and-pr`, `/prime`, `/research`, `/ultrathink`, `/publish`, `/release`) to `~/.config/opencode/commands/` — reused verbatim from `.claude/commands/` (the format is byte-compatible)
+4. Installs `AGENTS.md` as global instructions at `~/.config/opencode/AGENTS.md`
+5. Enables the `context7` MCP server for library docs lookup
+6. Prompts once for your `FIREWORKS_API_KEY` ([get one here](https://fireworks.ai/account/api-keys)) and persists it to your shell rc file
+7. Runs a smoke test against Fireworks to confirm auth + model availability
+
+**Prerequisites:** `curl`, `bash`, `python3`. No `jq` needed. Linux or macOS (Windows: use WSL).
+
+**Then:**
+
+```bash
+opencode
+# /models → GLM-5.1 is already selected
+# /commit, /prime, /ultrathink, etc. work identically to the Claude Code setup
+```
+
+**Shell aliases** — add to `.bashrc` / `.zshrc`:
+
+```bash
+alias oc="opencode" ocr="opencode --continue"
+```
+
+**Limitations vs. Claude Code:**
+
+- **No `guard.py` / PreToolUse security hook** — OpenCode has no event hooks. The config sets `permission.bash: "ask"` as the minimum safeguard (every shell command asks before running).
+- **No TTS notifications / custom statusline** — OpenCode has a built-in minimal statusline; no cached-MP3 voice alerts.
+- Everything else (slash commands, AGENTS.md, MCP servers, multi-agent workflows) ports 1:1.
+
+**Rollback / uninstall:**
+
+```bash
+rm -rf ~/.config/opencode ~/.opencode
+sed -i '/FIREWORKS_API_KEY/d' ~/.bashrc ~/.zshrc 2>/dev/null || true
+```
 
 ---
 
