@@ -97,7 +97,7 @@ Prerequisites: Node.js 18+, uv (python package manager), ffmpeg or mpv (audio fo
 Add to `.bashrc` / `.zshrc`:
 
 ```bash
-alias cx="codex" cxr="codex resume" cxd="codex --full-auto" cxdr="codex resume --full-auto"
+alias cx="codex" cxr="codex resume" cxd="codex --yolo" cxdr="codex resume --yolo"
 ```
 
 ---
